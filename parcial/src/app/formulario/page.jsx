@@ -118,7 +118,6 @@ export default function VersionCreatePage() {
             const uploadPromises = images.map((img, index) => {
             const imageFormData = new FormData();
             imageFormData.append("id", nuevaVersion.version);
-            imageFormData.append("descripcion", descripciones[index] || ""); // Añade la descripción
             imageFormData.append("image", img.file);
 
             return axios.post(IMAGENES_BASE_API, imageFormData, {
@@ -287,7 +286,6 @@ export default function VersionCreatePage() {
                                   </Label>
                                   <Input
                                     id={`descripcion-${index}`}
-                                    value={descripciones[index] || ""}
                                     onChange={(e) => {
                                     }}
                                     className="col-span-3"
