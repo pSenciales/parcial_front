@@ -32,6 +32,7 @@ const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
 
 async function crearVersion(formData) {
   try {
+    console.log(ARTICULO_BASE_API+"\t"+IMAGENES_BASE_API+"\n");
     const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, formData);
     if (res.status === 200 || res.status === 201) {
       return res.data;
