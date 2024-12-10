@@ -30,10 +30,12 @@ import { Label } from "@/components/ui/label"
 const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
 const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
 
-async function crearVersion(formData) {
+async function crearVersion(nombre) {
   try {
     console.log(ARTICULO_BASE_API+"\t"+IMAGENES_BASE_API+"\n");
-    const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, formData);
+    const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, {
+      nombre: nombre
+    });
     if (res.status === 200 || res.status === 201) {
       return res.data;
     } else {
@@ -106,12 +108,9 @@ export default function VersionCreatePage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const formData = new FormData();
-    formData.append("nombre", nombre);
-    
 
     try {
-      const nuevaVersion = await crearVersion(formData);
+      const nuevaVersion = await crearVersion(nombre);
 
       if (nuevaVersion) {
         try {
@@ -136,7 +135,6 @@ export default function VersionCreatePage() {
           images.forEach((img) => URL.revokeObjectURL(img.preview));
 
           // Redirigir al usuario
-          router.push(`/articulo/${id}`);
         } catch (error) {
           console.error("Error al subir las imágenes:", error);
           alert("Hubo un error al subir las imágenes.");
