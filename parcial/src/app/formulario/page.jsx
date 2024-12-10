@@ -117,7 +117,7 @@ export default function VersionCreatePage() {
           // Subir imágenes
             const uploadPromises = images.map((img, index) => {
             const imageFormData = new FormData();
-            imageFormData.append("id", nuevaVersion.version);
+            imageFormData.append("id", nuevaVersion._id);
             imageFormData.append("image", img.file);
 
             return axios.post(IMAGENES_BASE_API, imageFormData, {
