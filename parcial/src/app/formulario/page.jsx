@@ -33,7 +33,7 @@ const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
 const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
 
 
-async function crearVersion(autor,nombre,coordenadas) {
+async function crearVersion(autor, nombre, coordenadas) {
   try {
     console.log(ARTICULO_BASE_API + "\t" + IMAGENES_BASE_API + "\n");
     const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, {
@@ -148,8 +148,8 @@ export default function VersionCreatePage() {
       console.log("Coordenadas adjuntas: ", coordenadas);
     }
     try {
-      
-      const nuevaVersion = await crearVersion(autor,nombre,coordenadas);
+
+      const nuevaVersion = await crearVersion(autor, nombre, coordenadas);
 
       if (nuevaVersion) {
         try {
@@ -259,7 +259,7 @@ export default function VersionCreatePage() {
           <div className="grid grid-cols-1 gap-2">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="blue">Añadir imágenes</Button>
+                <Button className={"px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600"}>Añadir imágenes</Button>
               </SheetTrigger>
               <SheetContent
                 side={"bottom"}
@@ -370,12 +370,20 @@ export default function VersionCreatePage() {
               </SheetContent>
             </Sheet>
           </div>
-          <Button type="submit" variant="greenAceptar">
-            Crear
-          </Button>
-          <Button type="button" onClick={handleBack} variant="redCancelar">
-            Cancelar
-          </Button>
+          <div className="flex justify-center space-x-4 mt-4">
+            <Button
+              type="submit"
+              className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600 text-center">
+              Crear
+            </Button>
+            <Button
+              type="button"
+              onClick={handleBack}
+              className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600 text-center">
+              Cancelar
+            </Button>
+          </div>
+
         </form>
       </Box>
     </Box>
