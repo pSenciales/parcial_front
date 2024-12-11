@@ -14,11 +14,13 @@ const authOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       try {
+
+        console.log(user+"\n"+account+"\n"+profile)
         // Envía el log al servidor
         await axios.post(`${LOGS_BASE_API}`, {
           usuario: user.email, // Correo del usuario
           token: account.access_token, // Token de acceso de GitHub
-          caducidad: account.expires_at
+          caducidad: account.expires
         });
         console.log("Log de inicio de sesión registrado con éxito");
         return true; // Permite el inicio de sesión
