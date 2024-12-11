@@ -13,7 +13,7 @@ const authOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log("Inicio de sesión exitoso", user, account); // Verifica si la información del usuario es correcta
+      console.log(LOGS_BASE_API); // Verifica si la información del usuario es correcta
       return true; // Permite el inicio de sesión
     },
     async session({ session, token }) {
