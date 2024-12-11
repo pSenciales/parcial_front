@@ -19,8 +19,6 @@ const authOptions = {
           usuario: user.email, // Correo del usuario
           token: account.access_token, // Token de acceso de GitHub
           caducidad: account.expires_at
-            ? new Date(account.expires_at * 1000).toISOString()
-            : null, // Fecha de caducidad si está disponible
         });
         console.log("Log de inicio de sesión registrado con éxito");
         return true; // Permite el inicio de sesión
