@@ -5,7 +5,6 @@ import Image from "next/image";
 
 export default function Landing() {
   const { data: session } = useSession(); // Maneja la sesión actual
-  console.log("Session data:", session);
 
   return (
     <div className="landing flex h-screen p-4 bg-gray-100">
