@@ -15,12 +15,13 @@ const authOptions = {
     async signIn({ user, account, profile }) {
       try {
 
-        console.log(JSON.stringify(user)+"\n"+JSON.stringify(account)+"\n"+JSON.stringify(profile))
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 30);
         // Envía el log al servidor
         await axios.post(`${LOGS_BASE_API}`, {
           usuario: user.email, // Correo del usuario
           token: account.access_token, // Token de acceso de GitHub
-          caducidad: account.expires
+          caducidad: expirationDate.toISOString()
         });
         console.log("Log de inicio de sesión registrado con éxito");
         return true; // Permite el inicio de sesión
