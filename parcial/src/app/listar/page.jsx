@@ -1,10 +1,9 @@
 "use client";
-import { signIn, signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { Box, TextField } from '@mui/material';
+import { Box, TextField} from '@mui/material';
 import { FaTrash, FaCog, FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import {
   Sheet,
@@ -30,16 +29,12 @@ import { Label } from "@/components/ui/label"
 
 const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
 const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
-const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
 
-
-async function crearVersion(autor,nombre,coordenadas) {
+async function crearVersion(nombre) {
   try {
-    console.log(ARTICULO_BASE_API + "\t" + IMAGENES_BASE_API + "\n");
+    console.log(ARTICULO_BASE_API+"\t"+IMAGENES_BASE_API+"\n");
     const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, {
-      autor: autor,
-      nombre: nombre,
-      coordenadas: coordenadas
+      nombre: nombre
     });
     if (res.status === 200 || res.status === 201) {
       return res.data;
@@ -53,15 +48,10 @@ async function crearVersion(autor,nombre,coordenadas) {
 }
 
 export default function VersionCreatePage() {
-  const { data: session } = useSession(); // Maneja la sesión actual
-  //console.log("Session data:", session);
-
   const [nombre, setNombre] = useState("");
-  const [descripciones, setDescripciones] = useState([]);
   const [images, setImages] = useState([]);
   const [error, setError] = useState("");
   const [isError, setIsError] = useState(false);
-  const [ubicacion, setUbicacion] = useState("");
   const router = useRouter();
 
   const handleFileInputChange = (e) => {
@@ -77,7 +67,6 @@ export default function VersionCreatePage() {
         preview: URL.createObjectURL(file),
       }));
       setImages((prev) => [...prev, ...newImages]);
-      setDescripciones((prev) => [...prev, ...newImages.map(() => "")]);
       setError("");
       setIsError(false);
     }
@@ -97,7 +86,6 @@ export default function VersionCreatePage() {
         preview: URL.createObjectURL(file),
       }));
       setImages((prev) => [...prev, ...newImages]);
-      setDescripciones((prev) => [...prev, ...newImages.map(() => "")]); // Añade descripciones vacías
       setError("");
       setIsError(false);
     }
@@ -115,49 +103,21 @@ export default function VersionCreatePage() {
       URL.revokeObjectURL(imageToRemove.preview);
       return prev.filter((_, index) => index !== indexToRemove);
     });
-    setDescripciones((prev) => prev.filter((_, index) => index !== indexToRemove)); // Elimina la descripción correspondiente
   };
 
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const autor = session.user.name;
 
-    let coordenadas = null;
-    if (ubicacion?.trim()) {
-      try {
-        const response = await axios.get(`${MAPA_BASE_API}/${encodeURIComponent(ubicacion)}`);
-        if (response.status === 200 && response.data) {
-          coordenadas = [{
-            latitud: response.data.lat,
-            longitud: response.data.lon,
-          }];
-        } else {
-          console.error("No se encontraron coordenadas para la dirección proporcionada.");
-          alert("No se pudieron obtener coordenadas para la dirección. Verifica la ubicación ingresada.");
-          return;
-        }
-      } catch (error) {
-        console.error("Error al obtener las coordenadas:", error);
-        alert("Hubo un problema al procesar la ubicación ingresada.");
-        return;
-      }
-    }
-    if (coordenadas) {
-      coordenadas = JSON.stringify(coordenadas);
-      console.log("Coordenadas adjuntas: ", coordenadas);
-    }
     try {
-      
-      const nuevaVersion = await crearVersion(autor,nombre,coordenadas);
+      const nuevaVersion = await crearVersion(nombre);
 
       if (nuevaVersion) {
         try {
           // Subir imágenes
-          const uploadPromises = images.map((img, index) => {
+            const uploadPromises = images.map((img, index) => {
             const imageFormData = new FormData();
             imageFormData.append("id", nuevaVersion._id);
-            imageFormData.append("descripcion", descripciones[index] || ""); // Añade la descripción
             imageFormData.append("image", img.file);
 
             return axios.post(IMAGENES_BASE_API, imageFormData, {
@@ -249,13 +209,6 @@ export default function VersionCreatePage() {
           }}
         >
           <TextField label="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-          <TextField
-            label="Ubicación (opcional)"
-            value={ubicacion}
-            onChange={(e) => setUbicacion(e.target.value)}
-            helperText="Ejemplo: Calle Mayor, 1, Madrid"
-            multiline
-          />
           <div className="grid grid-cols-1 gap-2">
             <Sheet>
               <SheetTrigger asChild>
@@ -332,14 +285,7 @@ export default function VersionCreatePage() {
                                   </Label>
                                   <Input
                                     id={`descripcion-${index}`}
-                                    value={descripciones[index] || ""}
                                     onChange={(e) => {
-                                      const nuevaDescripcion = e.target.value;
-                                      setDescripciones((prev) => {
-                                        const copia = [...prev];
-                                        copia[index] = nuevaDescripcion; // Actualiza la descripción correspondiente
-                                        return copia;
-                                      });
                                     }}
                                     className="col-span-3"
                                   />

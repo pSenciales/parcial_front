@@ -1,5 +1,7 @@
 "use client";
 import localFont from "next/font/local";
+import MyNavbar from "@/components/ui/navbar";
+import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 
@@ -14,14 +16,16 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <SessionProvider>{children}</SessionProvider>
+      <body className="antialiased">
+        <NextUIProvider>
+          <MyNavbar />
+          <div style={{ marginTop: '4rem' }}> {/* Ajusta el margen superior según la altura del Navbar */}
+          <SessionProvider>{children}</SessionProvider>
+          </div>
+        </NextUIProvider>
       </body>
     </html>
   );
