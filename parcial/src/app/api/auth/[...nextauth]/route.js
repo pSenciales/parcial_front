@@ -13,21 +13,8 @@ const authOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      try {
-        // Envía el log al servidor
-        await axios.post(`${LOGS_BASE_API}`, {
-          usuario: user.email, // Correo del usuario
-          token: account.access_token, // Token de acceso de GitHub
-          caducidad: account.expires_at
-            ? new Date(account.expires_at * 1000).toISOString()
-            : null, // Fecha de caducidad si está disponible
-        });
-        console.log("Log de inicio de sesión registrado con éxito");
-        return true; // Permite el inicio de sesión
-      } catch (error) {
-        console.error("Error registrando el log de inicio de sesión:", error);
-        return false; // Bloquea el inicio de sesión si falla el log
-      }
+      console.log("Inicio de sesión exitoso", user, account); // Verifica si la información del usuario es correcta
+      return true; // Permite el inicio de sesión
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken; // Agrega el token a la sesión si lo necesitas
