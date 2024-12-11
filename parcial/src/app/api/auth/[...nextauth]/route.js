@@ -15,7 +15,7 @@ const authOptions = {
     async signIn({ user, account, profile }) {
       try {
 
-        console.log(user+"\n"+account+"\n"+profile)
+        console.log(JSON.stringify(user)+"\n"+JSON.stringify(account)+"\n"+JSON.stringify(profile))
         // Envía el log al servidor
         await axios.post(`${LOGS_BASE_API}`, {
           usuario: user.email, // Correo del usuario
