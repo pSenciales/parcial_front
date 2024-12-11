@@ -2,22 +2,11 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import axios from "axios";
 
 export default function Landing() {
   const { data: session } = useSession(); // Maneja la sesión actual
   console.log("Session data:", session);
-  const LOGS_BASE_API = process.env.NEXT_PUBLIC_LOGS_BASE_API;
 
-  const handleLogin = async () =>{
-    await signIn("github");
-    await axios.post(`${LOGS_BASE_API}`, {
-      usuario: session.user.email,
-      token: session.accessToken,
-      caducidad: session.expires
-    });
-  } 
-  
   return (
     <div className="landing flex h-screen p-4 bg-gray-100">
       {/* Sección izquierda */}
@@ -73,7 +62,7 @@ export default function Landing() {
             </div>
           ) : (
             <button
-              onClick={handleLogin()}
+              onClick={() => signIn("github")}
               className="w-full bg-gray-900 text-white hover:bg-gray-700 flex items-center justify-center space-x-2 rounded-md py-2 px-4 shadow-md transition-all duration-200"
             >
               <svg
