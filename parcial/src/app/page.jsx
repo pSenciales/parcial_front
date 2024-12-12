@@ -46,13 +46,15 @@ export default function Landing() {
                 Bienvenido, <strong className="text-blue-500">{session.user.name}</strong>!
               </p>
 
-              <Image
-                src={session.user.image}
-                alt="Avatar del usuario"
-                width={60}
-                height={60}
-                className="rounded-full border-2 border-blue-500 mb-4"
-              />
+              <div className="flex justify-center mb-4">
+                <Image
+                  src={session.user.image}
+                  alt="Avatar del usuario"
+                  width={50} 
+                  height={50}
+                  className="rounded-full border-2 border-blue-500"
+                />
+              </div>
 
               <button
                 onClick={() => signOut()}
