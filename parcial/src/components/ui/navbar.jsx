@@ -17,7 +17,7 @@ function NavbarContent() {
       {session ? (
         <button
         onClick={() => signIn("github")}
-        className="ml-auto bg-red-900 text-white hover:bg-red-700 flex items-center justify-center space-x-2 rounded-md py-2 px-4 shadow-md transition-all duration-200"
+        className="ml-auto bg-red-500 text-white hover:bg-red-600 flex items-center justify-center space-x-2 rounded-md py-2 px-4 shadow-md transition-all duration-200"
       >
         <span>Cerrar sesión</span>
       </button>
