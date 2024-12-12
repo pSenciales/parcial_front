@@ -197,7 +197,7 @@ export default function Landing() {
                   className="transition-all duration-300 transform scale-100 opacity-100"
                 >
                   <div className="flex justify-center items-center w-full">
-                    {articulos.fotos && articulos.fotos.length > 0 ? (<Carousel className="w-full max-w-xs">
+                    {articuloSelected && articuloSelected.fotos.length > 0 ? (<Carousel className="w-full max-w-xs">
                       <CarouselContent>
                         {articuloSelected.fotos.map((foto, index) => (
                           <CarouselItem key={index}>
@@ -221,14 +221,14 @@ export default function Landing() {
                       <CarouselPrevious />
                       <CarouselNext />
                     </Carousel>
-                    ) : 
-                    <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
-                      <CardHeader>
-                        <CardTitle className="text-xl font-bold">
-                          Aun no hay fotos disponibles
-                        </CardTitle>
-                      </CardHeader>
-                    </Card>}
+                    ) :
+                      <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                        <CardHeader>
+                          <CardTitle className="text-xl font-bold">
+                            Aun no hay fotos disponibles
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>}
                   </div>
                 </TabsContent>
 
