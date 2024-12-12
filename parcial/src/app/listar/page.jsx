@@ -1,330 +1,245 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation';
-import axios from "axios";
-import { Button } from "@/components/ui/button";
-import { Box, TextField} from '@mui/material';
-import { FaTrash, FaCog, FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Image from "next/image";
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { FaEye, FaTrashAlt } from "react-icons/fa";
+import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
 const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
+const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
+const LOGS_BASE_API = process.env.NEXT_PUBLIC_LOGS_BASE_API;
 
-async function crearVersion(nombre) {
-  try {
-    console.log(ARTICULO_BASE_API+"\t"+IMAGENES_BASE_API+"\n");
-    const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, {
-      nombre: nombre
-    });
-    if (res.status === 200 || res.status === 201) {
-      return res.data;
-    } else {
-      throw new Error(`Error al crear la versión: ${res.statusText}`);
-    }
-  } catch (error) {
-    console.error("Error en crearVersion:", error.message);
-    return null;
+
+export default function Landing() {
+  const { data: session } = useSession(); // Maneja la sesión actual
+  const [articulos, setArticulos] = useState([]);
+  const [articuloSelected, setArticuloSelected] = useState();
+  const [mapaSelected, setMapaSelected] = useState();
+
+
+
+  const parseFecha = (fecha) => {
+    const fechaParse = new Date(fecha);
+    const opciones = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+    return fechaParse.toLocaleDateString('es-ES', opciones);
   }
-}
 
-export default function VersionCreatePage() {
-  const [nombre, setNombre] = useState("");
-  const [images, setImages] = useState([]);
-  const [error, setError] = useState("");
-  const [isError, setIsError] = useState(false);
-  const router = useRouter();
-
-  const handleFileInputChange = (e) => {
-    const files = Array.from(e.target.files);
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-
-    if (images.length + imageFiles.length > 5) {
-      setError("*Solo se pueden subir hasta 5 imágenes*");
-      setIsError(true);
-    } else {
-      const newImages = imageFiles.map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-      setImages((prev) => [...prev, ...newImages]);
-      setError("");
-      setIsError(false);
-    }
-  };
-
-  const handleDrop = (event) => {
-    event.preventDefault();
-    const files = Array.from(event.dataTransfer.files);
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-
-    if (images.length + imageFiles.length > 5) {
-      setError("*Solo se pueden subir hasta 5 imágenes*");
-      setIsError(true);
-    } else {
-      const newImages = imageFiles.map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-      setImages((prev) => [...prev, ...newImages]);
-      setError("");
-      setIsError(false);
-    }
-  };
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
-  };
-
-  const handleRemoveImage = (indexToRemove) => {
-    setError("");
-    setIsError(false);
-    setImages((prev) => {
-      const imageToRemove = prev[indexToRemove];
-      URL.revokeObjectURL(imageToRemove.preview);
-      return prev.filter((_, index) => index !== indexToRemove);
-    });
-  };
-
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const fetcharticulos = async () => {
     try {
-      const nuevaVersion = await crearVersion(nombre);
-
-      if (nuevaVersion) {
-        try {
-          // Subir imágenes
-            const uploadPromises = images.map((img, index) => {
-            const imageFormData = new FormData();
-            imageFormData.append("id", nuevaVersion._id);
-            imageFormData.append("image", img.file);
-
-            return axios.post(IMAGENES_BASE_API, imageFormData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            });
-          });
-
-          // Esperar a que todas las imágenes se suban
-          await Promise.all(uploadPromises);
-          console.log("Todas las imágenes se han subido con éxito");
-
-          // Revocar las URLs de previsualización
-          images.forEach((img) => URL.revokeObjectURL(img.preview));
-
-          // Redirigir al usuario
-        } catch (error) {
-          console.error("Error al subir las imágenes:", error);
-          alert("Hubo un error al subir las imágenes.");
-        }
+      const res = await axios.get(`${ARTICULO_BASE_API}`);
+      if (res.status === 200) {
+        setArticulos(res.data);
+      } else {
+        console.error("Error fetching articulos:", res.status);
       }
     } catch (error) {
-      console.error("Error al crear la versión:", error);
-      alert("Hubo un problema al crear la versión.");
+      console.error("Error in fetcharticulos:", error.message);
     }
-  }
-
-  const handleMoveL = (index) => {
-    if (index !== 0) {
-      const newImages = [...images];
-
-      const temp = newImages[index - 1];
-      newImages[index - 1] = newImages[index];
-      newImages[index] = temp;
-
-      setImages(newImages);
-    }
-  }
-
-  const handleBack = () => {
-    router.back();
   };
 
+  useEffect(() => {
+    fetcharticulos();
+  }, [articulos]);
 
-  const handleMoveR = (index) => {
-    if (index !== images.length - 1) {
-      const newImages = [...images];
-
-      const temp = newImages[index + 1];
-      newImages[index + 1] = newImages[index];
-      newImages[index] = temp;
-
-      setImages(newImages);
+  const handleBorrar = async (id) => {
+    try {
+      const res = await axios.delete(`${ARTICULO_BASE_API}/articulo/${id}`);
+      if (res.status === 200) {
+        await fetcharticulos();
+        setArticuloSelected(null);
+        setMapaSelected(null);
+      } else {
+        console.error("Error fetching articulos:", res.status);
+      }
+    } catch (error) {
+      console.error("Error in fetcharticulos:", error.message);
     }
+  };
+
+  const handleVisualizar = async (index) => {
+    setArticuloSelected(articulos[index]);
+    console.log(articuloSelected);
+    await axios.get(`${MAPA_BASE_API}/${articulos[index].coordenadas[0].latitud}/${articulos[index].coordenadas[0].longitud}`).
+      then((mapa) => {
+        setMapaSelected(mapa.data.iframeUrl);
+      });
   }
 
+  useEffect(() => {
+
+  }, [articuloSelected, mapaSelected])
+
+
   return (
-    <Box className="bg-gradient-to-r from-green-200 to-blue-200"
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center', // Asegura que el contenido esté centrado horizontalmente
-        justifyContent: 'top', // Centra el contenido verticalmente
-        height: '100vh', // Altura completa de la ventana
-        p: 4, // Padding general
-      }}>
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: 'white', // Fondo blanco para el cuadro
-        boxShadow: 3, // Sombra para darle un efecto "elevado"
-        p: 4, // Espaciado interno
-        borderRadius: 2, // Bordes redondeados
-        maxWidth: 500, // Ancho máximo del cuadro
-        width: '90%', // Ancho relativo para adaptarse a pantallas pequeñas
-      }}>
-        <h1 className="text-2xl font-bold mb-3">Crear Nueva Versión</h1>
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-            width: '100%',
-            maxWidth: '400px',
-          }}
-        >
-          <TextField label="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-          <div className="grid grid-cols-1 gap-2">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="blue">Añadir imágenes</Button>
-              </SheetTrigger>
-              <SheetContent
-                side={"bottom"}
-                className="h-1/4 transition-all duration-300 hover:h-2/6"
-              >
-                <SheetHeader>
-                  <SheetTitle>Suelta las imágenes aquí</SheetTitle>
-                  <SheetDescription>
-                    Las imágenes se subirán al artículo
-                  </SheetDescription>
-                </SheetHeader>
-                <div
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  className="border-2 border-dashed border-gray-400 rounded-md p-4 text-center cursor-pointer bg-gray-50 hover:bg-gray-100"
-                  style={{ minHeight: "150px" }}
+    <div className="landing flex h-screen p-4 bg-gray-100">
+      {/* Sección izquierda */}
+      <div className="left-section flex-1 bg-gradient-to-r from-green-200 to-blue-200 rounded-3xl flex flex-col justify-center items-center text-center p-8 shadow-lg">
+        <h1 className="text-5xl font-bold text-blue-800 mb-4 font-poppins">
+          Articulos</h1>
+        <ScrollArea className="bg-white h-72 w-9/12 rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">Autor</TableHead>
+                <TableHead className="text-center">Nombre</TableHead>
+                <TableHead className="text-center">Fecha</TableHead>
+                <TableHead className="text-center">Visualizar</TableHead>
+                <TableHead className="text-center">Borrar</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {articulos && articulos.length > 0 ? (
+                articulos.map((articulo, index) => (
+                  <TableRow key={articulo._id}>
+                    <TableCell className="text-center">{articulo.autor}</TableCell>
+                    <TableCell className="text-center">{articulo.nombre}</TableCell>
+                    <TableCell className="text-center">{parseFecha(articulo.fecha)}</TableCell>
+                    <TableCell className="text-center">
+                      <button onClick={() => { handleVisualizar(index) }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600">
+                        <FaEye />
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button onClick={() => { handleBorrar(articulo._id) }} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
+                        <FaTrashAlt />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    No hay artículos disponibles
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </ScrollArea>
+      </div>
+
+      {/* Sección derecha */}
+      <div className="right-section flex-1 flex flex-col justify-center items-center p-8 bg-white rounded-3xl shadow-lg">
+        <h1 className="text-3xl font-bold mb-6 text-gray-800 font-poppins">
+          Articulo seleccionado
+        </h1>
+        <div className="form w-full max-w-sm space-y-4">
+          {articuloSelected ? (
+            <div className="text-center">
+              <Tabs defaultValue="account" className="w-full flex flex-col items-center">
+                <TabsList>
+                  <TabsTrigger value="account">Mapas</TabsTrigger>
+                  <TabsTrigger value="password">Imágenes</TabsTrigger>
+                  <TabsTrigger value="details">Detalles</TabsTrigger>
+                </TabsList>
+
+                <TabsContent
+                  value="account"
+                  className="transition-all duration-300 transform scale-100 opacity-100"
                 >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    id="fileInput"
-                    style={{ display: "none" }}
-                    onChange={handleFileInputChange}
-                  />
-                  <Button
-                    onClick={isError ? () => { } : () => document.getElementById("fileInput").click()}
-                    className={`px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 ${isError
-                      ? "bg-red-500 text-white hover:bg-red-600"
-                      : "bg-blue-500 text-white hover:bg-blue-600"
-                      }`}
-                  >
-                    {isError ? error : "Seleccionar imágenes"}
-                  </Button>
-
-                  <p className="text-gray-600 mt-2">O arrastra y suelta tus imágenes aquí</p>
-                  {images.length > 0 && (
-                    <div className="mt-4 flex gap-4 overflow-x-auto">
-                      {images.map((img, index) => (
-                        <div key={index} className="relative w-24 h-24 flex-shrink-0">
-                          <img
-                            src={img.preview}
-                            alt={`uploaded-${index}`}
-                            className="w-full h-full object-cover rounded-md"
-                          />
-                          <button
-                            onClick={() => handleRemoveImage(index)}
-                            className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-200"
-                            aria-label="Eliminar imagen"
-                          >
-                            <FaTrash className="text-red-600" />
-                          </button>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <button className="absolute top-1 left-1 bg-white rounded-full p-1 shadow hover:bg-gray-200 ml-1">
-                                <FaCog className="text-gray-600" />
-                              </button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
-                                <DialogTitle>Añadir descripción</DialogTitle>
-                                <DialogDescription>
-                                  Asigna una descripción a la imagen
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                  <Label htmlFor={`descripcion-${index}`} className="text-right">
-                                    Descripción
-                                  </Label>
-                                  <Input
-                                    id={`descripcion-${index}`}
-                                    onChange={(e) => {
-                                    }}
-                                    className="col-span-3"
-                                  />
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          <button
-                            onClick={() => handleMoveR(index)}
-                            className="absolute bottom-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-200"
-                            aria-label="Intercambiar la imagen con la de la derecha"
-                          >
-                            <FaArrowRight className="text-black-600" />
-                          </button>
-                          <button
-                            onClick={() => handleMoveL(index)}
-                            className="absolute bottom-1 left-1 bg-white rounded-full p-1 shadow hover:bg-gray-200 ml-1"
-                            aria-label="Intercambiar la imagen con la de la izquierda"
-                          >
-                            <FaArrowLeft className="text-black-600" />
-                          </button>
-                        </div>
-                      ))}
-
-                    </div>
+                  {mapaSelected ? (
+                    <iframe
+                      src={mapaSelected}
+                      className="w-full h-64 rounded-md border"
+                      title="Mapa del Artículo"
+                    />
+                  ) : (
+                    <p className="text-center">No se pudo cargar el mapa</p>
                   )}
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-          <Button type="submit" variant="greenAceptar">
-            Crear
-          </Button>
-          <Button type="button" onClick={handleBack} variant="redCancelar">
-            Cancelar
-          </Button>
-        </form>
-      </Box>
-    </Box>
+                </TabsContent>
 
+                <TabsContent
+                  value="password"
+                  className="transition-all duration-300 transform scale-100 opacity-100"
+                >
+                  <div className="flex justify-center items-center w-full">
+                    <Carousel className="w-full max-w-xs">
+                      <CarouselContent>
+                        {articuloSelected.fotos.map((foto, index) => (
+                          <CarouselItem key={index}>
+                            <div className="p-1">
+                              <Card>
+                                <CardContent className="flex aspect-square items-center justify-center p-6">
+                                  <img
+                                    src={foto.url}
+                                    alt={`Foto ${index}`}
+                                    className="rounded-lg"
+                                  />
+                                </CardContent>
+                                  <span>
+                                    {foto.descripcion}
+                                  </span>
+                              </Card>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                    </Carousel>
+                  </div>
+                </TabsContent>
+
+                <TabsContent
+                  value="details"
+                  className="transition-all duration-300 transform scale-100 opacity-100"
+                >
+                  <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold">
+                        {articuloSelected.nombre}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600">
+                        <strong>Autor:</strong> {articuloSelected.autor}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <strong>Fecha:</strong> {parseFecha(articuloSelected.fecha)}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+
+            </div>
+          ) : (
+            <><p className="text-center">Todavía no se ha seleccionado el articulo</p></>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

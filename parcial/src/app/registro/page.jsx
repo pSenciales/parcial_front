@@ -84,9 +84,7 @@ const invoices = [
   },
 ]
 
-const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
-const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
-const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
+
 const LOGS_BASE_API = process.env.NEXT_PUBLIC_LOGS_BASE_API;
 
 
@@ -161,7 +159,6 @@ export default function VersionCreatePage() {
                   </TableRow>
                 </>
               ))}
-              <Separator></Separator>
             </TableBody>
           </Table>
         </ScrollArea>

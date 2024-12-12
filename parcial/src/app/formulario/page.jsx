@@ -160,7 +160,7 @@ export default function VersionCreatePage() {
             imageFormData.append("descripcion", descripciones[index] || ""); // Añade la descripción
             imageFormData.append("image", img.file);
 
-            return axios.post(IMAGENES_BASE_API, imageFormData, {
+            return axios.post("https://parcial-back-seven.vercel.app/imagenes", imageFormData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
