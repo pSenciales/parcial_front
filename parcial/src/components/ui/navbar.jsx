@@ -11,7 +11,7 @@ export default function MyNavbar() {
       <Link href="/" className="logo">MiApp</Link>
       <Link href="/listar">Listar</Link>
       <Link href="/formulario">Crear</Link>
-      <Link href="/prueba">Mi Cuenta</Link>
+      <Link href="/registro">Logs</Link>
       <button  className="ml-auto">
       </button>
     </nav>

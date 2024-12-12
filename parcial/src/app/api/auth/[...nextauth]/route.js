@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import axios from "axios";
 
-const LOGS_BASE_API = process.env.NEXT_PUBLIC_LOGS_BASE_API; // Define la base de tu API en variables de entorno
+const LOGS_BASE_API = process.env.NEXT_PUBLIC_LOGS_BASE_API; 
 
 const authOptions = {
   providers: [
