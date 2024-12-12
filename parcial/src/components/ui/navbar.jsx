@@ -17,7 +17,7 @@ function NavbarContent() {
       {session ? (
         <button
           onClick={() => signOut()}
-          className="w-full bg-red-500 text-white font-medium hover:bg-red-600 hover:scale-105 transform transition-transform duration-200 ease-in-out rounded-full py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
+          className="bg-red-500 text-white font-medium hover:bg-red-600 hover:scale-105 transform transition-transform duration-200 ease-in-out rounded-full py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
         >
           Cerrar Sesión
         </button>
