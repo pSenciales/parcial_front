@@ -40,21 +40,23 @@ export default function Landing() {
         </h2>
         <div className="form w-full max-w-sm space-y-4">
           {session ? (
-            
-            <div className="text-center">
-              <p className="text-lg mb-4">
-                Bienvenido, <strong>{session.user.name}</strong>!
+
+            <div className="text-center p-6 bg-gray-100 rounded-lg shadow-lg">
+              <p className="text-xl font-semibold mb-4 text-gray-700">
+                Bienvenido, <strong className="text-blue-500">{session.user.name}</strong>!
               </p>
+
               <Image
                 src={session.user.image}
                 alt="Avatar del usuario"
-                width={80}
-                height={80}
-                className="rounded-full mb-4"
+                width={60}
+                height={60}
+                className="rounded-full border-2 border-blue-500 mb-4"
               />
+
               <button
                 onClick={() => signOut()}
-                className="w-full bg-red-500 text-white hover:bg-red-600 hover:scale-105 transform transition-all duration-200 rounded-full py-2 shadow-md"
+                className="w-full bg-red-500 text-white font-medium hover:bg-red-600 hover:scale-105 transform transition-transform duration-200 ease-in-out rounded-full py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
               >
                 Cerrar Sesión
               </button>

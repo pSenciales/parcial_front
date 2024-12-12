@@ -2,6 +2,7 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import Swal from 'sweetalert2';
 import axios from "axios";
 import Image from "next/image";
 import { Input } from "@/components/ui/input"
@@ -75,18 +76,29 @@ export default function Landing() {
 
   const handleBorrar = async (id) => {
     try {
-      const res = await axios.delete(`${ARTICULO_BASE_API}/articulo/${id}`);
-      if (res.status === 200) {
-        await fetcharticulos();
-        setArticuloSelected(null);
-        setMapaSelected(null);
-      } else {
-        console.error("Error fetching articulos:", res.status);
+      if (session) {
+        const res = await axios.delete(`${ARTICULO_BASE_API}/articulo/${id}`);
+        if (res.status === 200) {
+          await fetcharticulos();
+          setArticuloSelected(null);
+          setMapaSelected(null);
+        } else {
+          console.error("Error fetching articulos:", res.status);
+        }
+      }
+      else {
+        Swal.fire({
+          icon: "error",
+          title: "Debe iniciar sesión para borrar",
+          footer: '<a href="/">Quiero iniciar sesión</a>'
+        });
       }
     } catch (error) {
       console.error("Error in fetcharticulos:", error.message);
     }
+
   };
+
 
   const handleVisualizar = async (index) => {
     setArticuloSelected(articulos[index]);
@@ -185,7 +197,7 @@ export default function Landing() {
                   className="transition-all duration-300 transform scale-100 opacity-100"
                 >
                   <div className="flex justify-center items-center w-full">
-                    <Carousel className="w-full max-w-xs">
+                    {articulos.fotos && articulos.fotos.length > 0 ? (<Carousel className="w-full max-w-xs">
                       <CarouselContent>
                         {articuloSelected.fotos.map((foto, index) => (
                           <CarouselItem key={index}>
@@ -198,9 +210,9 @@ export default function Landing() {
                                     className="rounded-lg"
                                   />
                                 </CardContent>
-                                  <span>
-                                    {foto.descripcion}
-                                  </span>
+                                <span>
+                                  {foto.descripcion}
+                                </span>
                               </Card>
                             </div>
                           </CarouselItem>
@@ -209,6 +221,14 @@ export default function Landing() {
                       <CarouselPrevious />
                       <CarouselNext />
                     </Carousel>
+                    ) : 
+                    <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                      <CardHeader>
+                        <CardTitle className="text-xl font-bold">
+                          Aun no hay fotos disponibles
+                        </CardTitle>
+                      </CardHeader>
+                    </Card>}
                   </div>
                 </TabsContent>
 

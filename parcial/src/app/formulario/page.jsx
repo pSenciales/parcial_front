@@ -173,6 +173,7 @@ export default function VersionCreatePage() {
 
           // Revocar las URLs de previsualización
           images.forEach((img) => URL.revokeObjectURL(img.preview));
+          router.push("/listar");
 
           // Redirigir al usuario
         } catch (error) {
