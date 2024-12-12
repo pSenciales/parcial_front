@@ -26,7 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { FaEye, FaTrashAlt } from "react-icons/fa";
+import { FaEye, FaTrashAlt, FaEdit } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -47,7 +47,7 @@ export default function Landing() {
   const { data: session } = useSession(); // Maneja la sesión actual
   const [articulos, setArticulos] = useState([]);
   const [articuloSelected, setArticuloSelected] = useState();
-  const [mapaSelected, setMapaSelected] = useState();
+  const [mapaSelected, setMapaSelected] = useState([]);
 
 
 
@@ -98,16 +98,26 @@ export default function Landing() {
     }
 
   };
-
+  
 
   const handleVisualizar = async (index) => {
-    setArticuloSelected(articulos[index]);
-    console.log(articuloSelected);
-    await axios.get(`${MAPA_BASE_API}/${articulos[index].coordenadas[0].latitud}/${articulos[index].coordenadas[0].longitud}`).
-      then((mapa) => {
-        setMapaSelected(mapa.data.iframeUrl);
-      });
-  }
+    try {
+      const articulo = articulos[index];
+      setArticuloSelected(articulo);
+
+      const mapas = await Promise.all(
+        articulo.coordenadas.map(async (coordenada) => {
+          const res = await axios.get(`${MAPA_BASE_API}/${coordenada.latitud}/${coordenada.longitud}`);
+          return res.data.iframeUrl;
+        })
+      );
+
+      setMapaSelected(mapas);
+    } catch (error) {
+      console.error("Error al visualizar:", error);
+    }
+  };
+
 
   useEffect(() => {
 
@@ -128,6 +138,7 @@ export default function Landing() {
                 <TableHead className="text-center">Nombre</TableHead>
                 <TableHead className="text-center">Fecha</TableHead>
                 <TableHead className="text-center">Visualizar</TableHead>
+                <TableHead className="text-center">Editar</TableHead>
                 <TableHead className="text-center">Borrar</TableHead>
               </TableRow>
             </TableHeader>
@@ -141,6 +152,11 @@ export default function Landing() {
                     <TableCell className="text-center">
                       <button onClick={() => { handleVisualizar(index) }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600">
                         <FaEye />
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button onClick={() => { /*handleEditar(index)*/ }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-yellow-500 text-white hover:bg-yellow-600">
+                        <FaEdit />
                       </button>
                     </TableCell>
                     <TableCell className="text-center">
@@ -181,15 +197,37 @@ export default function Landing() {
                   value="account"
                   className="transition-all duration-300 transform scale-100 opacity-100"
                 >
-                  {mapaSelected ? (
-                    <iframe
-                      src={mapaSelected}
-                      className="w-full h-64 rounded-md border"
-                      title="Mapa del Artículo"
-                    />
-                  ) : (
-                    <p className="text-center">No se pudo cargar el mapa</p>
-                  )}
+                  <div className="flex justify-center items-center w-full">
+                    {articuloSelected && articuloSelected.coordenadas.length > 0 ? (<Carousel className="w-full max-w-xs">
+                      <CarouselContent>
+                        {mapaSelected.map((mapa, index) => (
+                          <CarouselItem key={index}>
+                            <div className="p-1">
+                              <Card>
+                                <CardContent className="flex aspect-square items-center justify-center p-6">
+                                  <iframe
+                                    src={mapa}
+                                    className="w-full h-64 rounded-md border"
+                                    title="Mapa del Artículo"
+                                  />
+                                </CardContent>
+                              </Card>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                    </Carousel>
+                    ) :
+                      <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                        <CardHeader>
+                          <CardTitle className="text-xl font-bold">
+                            No se pudieron cargar mapas
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>}
+                  </div>
                 </TabsContent>
 
                 <TabsContent
