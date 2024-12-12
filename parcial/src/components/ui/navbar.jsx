@@ -16,7 +16,7 @@ function NavbarContent() {
       <Link href="/registro">Logs</Link>
       {session ? (
         <button
-        onClick={() => signIn("github")}
+        onClick={() => signOut()}
         className="ml-auto bg-red-500 text-white hover:bg-red-600 flex items-center justify-center space-x-2 rounded-md py-2 px-4 shadow-md transition-all duration-200"
       >
         <span>Cerrar sesión</span>

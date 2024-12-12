@@ -119,19 +119,19 @@ export default function VersionCreatePage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">Timestamp</TableHead>
-                <TableHead>Usuario</TableHead>
-                <TableHead>Token</TableHead>
-                <TableHead className="text-right">Caducidad</TableHead>
+                <TableHead className="text-center">Timestamp</TableHead>
+                <TableHead className="text-center">Usuario</TableHead>
+                <TableHead className="text-center">Token</TableHead>
+                <TableHead className="text-center">Caducidad</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {logs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell className="font-medium">{parseFecha(log.timestamp)}</TableCell>
-                  <TableCell>{log.usuario}</TableCell>
-                  <TableCell>{log.token}</TableCell>
-                  <TableCell className="text-right">{parseFecha(log.caducidad)}</TableCell>
+                  <TableCell className="font-medium text-center">{parseFecha(log.timestamp)}</TableCell>
+                  <TableCell className="text-center">{log.usuario}</TableCell>
+                  <TableCell className="text-center">{log.token}</TableCell>
+                  <TableCell className="text-center">{parseFecha(log.caducidad)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
