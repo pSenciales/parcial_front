@@ -58,7 +58,7 @@ export default function Landing() {
 
               <button
                 onClick={() => signOut()}
-                className="ml-auto bg-red-500 text-white hover:bg-red-600 flex items-center justify-center space-x-2 rounded-md py-2 px-4 shadow-md transition-all duration-200"
+                className="w-full bg-gray-500 text-white hover:bg-gray-600 flex items-center justify-center space-x-2 rounded-md py-2 px-4 shadow-md transition-all duration-200"
                 >
                 Cerrar Sesión
               </button>
