@@ -41,12 +41,11 @@ const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
 const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
 
 
-async function crearVersion(autor, nombre, coordenadas) {
+async function crearVersion(autor, coordenadas) {
   try {
     console.log(ARTICULO_BASE_API + "\t" + IMAGENES_BASE_API + "\n");
     const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, {
       autor: autor,
-      nombre: nombre,
       coordenadas: coordenadas
     });
     if (res.status === 200 || res.status === 201) {
@@ -196,7 +195,7 @@ export default function VersionCreatePage() {
 
     try {
 
-      const nuevaVersion = await crearVersion(autor, nombre, coordenadas);
+      const nuevaVersion = await crearVersion(autor, coordenadas);
 
       if (nuevaVersion) {
         try {
