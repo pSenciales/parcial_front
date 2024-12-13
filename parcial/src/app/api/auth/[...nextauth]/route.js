@@ -12,7 +12,7 @@ const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    /*async signIn({ user, account, profile }) {
       try {
 
         const expirationDate = new Date();
@@ -29,7 +29,7 @@ const authOptions = {
         console.error("Error registrando el log de inicio de sesión:", error);
         return false; // Bloquea el inicio de sesión si falla el log
       }
-    },
+    },*/
     async session({ session, token }) {
       session.accessToken = token.accessToken; // Agrega el token a la sesión si lo necesitas
       return session;
