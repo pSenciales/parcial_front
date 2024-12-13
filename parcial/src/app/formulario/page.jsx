@@ -123,30 +123,43 @@ export default function VersionCreatePage() {
     event.preventDefault();
     const autor = session.user.name;
 
-    let coordenadas = null;
+    let coordenadas = [];
+
     if (ubicacion?.trim()) {
+      // Divide las ubicaciones por ';' y elimina espacios extra
+      const ubicaciones = ubicacion.split(";").map((u) => u.trim());
+
       try {
-        const response = await axios.get(`${MAPA_BASE_API}/${encodeURIComponent(ubicacion)}`);
-        if (response.status === 200 && response.data) {
-          coordenadas = [{
-            latitud: response.data.lat,
-            longitud: response.data.lon,
-          }];
-        } else {
-          console.error("No se encontraron coordenadas para la dirección proporcionada.");
-          alert("No se pudieron obtener coordenadas para la dirección. Verifica la ubicación ingresada.");
-          return;
+        // Procesar cada ubicación y obtener sus coordenadas
+        for (const lugar of ubicaciones) {
+          if (lugar) {
+            const response = await axios.get(`${MAPA_BASE_API}/${encodeURIComponent(lugar)}`);
+            if (response.status === 200 && response.data) {
+              coordenadas.push({
+                latitud: response.data.lat,
+                longitud: response.data.lon,
+                lugar, // Guarda el nombre del lugar para referencia
+              });
+            } else {
+              console.error(`No se encontraron coordenadas para la dirección: ${lugar}`);
+              alert(`No se pudieron obtener coordenadas para la dirección: ${lugar}. Verifica la ubicación ingresada.`);
+            }
+          }
         }
       } catch (error) {
         console.error("Error al obtener las coordenadas:", error);
-        alert("Hubo un problema al procesar la ubicación ingresada.");
+        alert("Hubo un problema al procesar las ubicaciones ingresadas.");
         return;
       }
     }
-    if (coordenadas) {
-      coordenadas = JSON.stringify(coordenadas);
-      console.log("Coordenadas adjuntas: ", coordenadas);
+
+    if (coordenadas.length > 0) {
+      const coordenadasJson = JSON.stringify(coordenadas);
+      console.log("Coordenadas adjuntas: ", coordenadasJson);
+    } else {
+      console.log("No se obtuvieron coordenadas para las ubicaciones ingresadas.");
     }
+
     try {
 
       const nuevaVersion = await crearVersion(autor, nombre, coordenadas);
@@ -160,7 +173,7 @@ export default function VersionCreatePage() {
             imageFormData.append("descripcion", descripciones[index] || ""); // Añade la descripción
             imageFormData.append("image", img.file);
 
-            return axios.post("https://parcial-back-seven.vercel.app/imagenes", imageFormData, {
+            return axios.post(IMAGENES_BASE_API, imageFormData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
@@ -218,7 +231,7 @@ export default function VersionCreatePage() {
 
   return (
 
-    
+
 
     <Box className="bg-gradient-to-r from-green-200 to-blue-200"
       sx={{
@@ -229,51 +242,51 @@ export default function VersionCreatePage() {
         height: '100vh', // Altura completa de la ventana
         p: 4, // Padding general
       }}>
-        {!session && (
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backdropFilter: 'blur(8px)',
-          backgroundColor: 'rgba(255, 255, 255, 0.7)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10,
-        }}
-      >
+      {!session && (
         <Box
           sx={{
-            textAlign: 'center',
-            bgcolor: 'white',
-            p: 4,
-            borderRadius: 2,
-            boxShadow: 3,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10,
           }}
         >
-          <p className="text-lg font-medium text-gray-700 mb-4">
-            Debes iniciar sesión para crear un artículo.
-          </p>
-          <button
-            onClick={() => signIn("github")}
-            className="w-full bg-gray-900 text-white hover:bg-gray-700 flex items-center justify-center space-x-2 rounded-md py-2 px-4 shadow-md transition-all duration-200"
+          <Box
+            sx={{
+              textAlign: 'center',
+              bgcolor: 'white',
+              p: 4,
+              borderRadius: 2,
+              boxShadow: 3,
+            }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-              className="w-5 h-5"
+            <p className="text-lg font-medium text-gray-700 mb-4">
+              Debes iniciar sesión para crear un artículo.
+            </p>
+            <button
+              onClick={() => signIn("github")}
+              className="w-full bg-gray-900 text-white hover:bg-gray-700 flex items-center justify-center space-x-2 rounded-md py-2 px-4 shadow-md transition-all duration-200"
             >
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.2 1.87.85 2.33.65.07-.52.28-.85.51-1.05-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
-            </svg>
-            <span>Iniciar sesión con GitHub</span>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+                className="w-5 h-5"
+              >
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.2 1.87.85 2.33.65.07-.52.28-.85.51-1.05-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+              </svg>
+              <span>Iniciar sesión con GitHub</span>
+            </button>
+          </Box>
         </Box>
-      </Box>
-    )}
+      )}
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -299,10 +312,10 @@ export default function VersionCreatePage() {
         >
           <TextField label="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
           <TextField
-            label="Ubicación (opcional)"
+            label="Ubicaciones (opcional)"
             value={ubicacion}
             onChange={(e) => setUbicacion(e.target.value)}
-            helperText="Ejemplo: Calle Mayor, 1, Madrid"
+            helperText="Separa con ';', ej: Madrid;Málaga"
             multiline
           />
           <div className="grid grid-cols-1 gap-2">
