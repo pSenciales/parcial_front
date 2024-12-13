@@ -10,7 +10,7 @@ function NavbarContent() {
 
   return (
     <nav className="navbar">
-      <Link href="/" className="logo">MiApp</Link>
+      <Link href="/" className="logo">MiMapa</Link>
       <Link href="/listar">Listar</Link>
       <Link href="/formulario">Crear</Link>
       <Link href="/registro">Logs</Link>

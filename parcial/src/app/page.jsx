@@ -11,21 +11,21 @@ export default function Landing() {
       {/* Sección izquierda */}
       <div className="left-section flex-1 bg-gradient-to-r from-green-200 to-blue-200 rounded-3xl flex flex-col justify-center items-center text-center p-8 shadow-lg">
         <h1 className="text-5xl font-bold text-blue-800 mb-4 font-poppins">
-          LaWiki
+          MiMapa
         </h1>
         <p className="text-xl text-gray-700 italic font-poppins">
-          El saber de todos, para todos.
+          ¡Comparte tus viajes!
         </p>
         <div className="mt-8 flex space-x-4 text-2xl">
-          <span>📖</span>
-          <span>🖋️</span>
+          <span>📸</span>
+          <span>🗺️</span>
           <span>🌐</span>
         </div>
 
         <div className="mt-8">
           <Image
-            src="/images/lawiki-character.png"
-            alt="Ilustración de LaWiki"
+            src="/images/MapaIcono.png"
+            alt="Ilustración de MiMapa"
             width={400}
             height={300}
             className="rounded-lg"
