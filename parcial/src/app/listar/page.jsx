@@ -139,7 +139,10 @@ export default function Landing() {
     }
   };
 
+  const handleGuardar = async () => {};
 
+  const handleCancelar = async () => {};
+  
   useEffect(() => {
 
   }, [articuloSelected, mapaSelected, editar]);
