@@ -142,7 +142,7 @@ export default function Landing() {
 
   useEffect(() => {
 
-  }, [articuloSelected, mapaSelected])
+  }, [articuloSelected, mapaSelected, editar]);
 
 
   return (
@@ -176,7 +176,7 @@ export default function Landing() {
                       </button>
                     </TableCell>
                     <TableCell className="text-center">
-                      <button onClick={() => { /*handleEditar(index)*/ }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-yellow-500 text-white hover:bg-yellow-600">
+                      <button onClick={() => { handleEditar(index) }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-yellow-500 text-white hover:bg-yellow-600">
                         <FaEdit />
                       </button>
                     </TableCell>
