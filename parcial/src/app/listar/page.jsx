@@ -49,6 +49,9 @@ export default function Landing() {
   const [articuloSelected, setArticuloSelected] = useState();
   const [mapaSelected, setMapaSelected] = useState([]);
   const [editar, setEditar] = useState(false);
+  const [ubicacion, setUbicacion] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [descripciones, setDescripciones] = useState([]);
 
 
 
@@ -123,7 +126,10 @@ export default function Landing() {
   const handleEditar = async (index) => {
     try {
       const articulo = articulos[index];
+      setUbicacion(articulo.ubicacion);
+      setNombre(articulo.nombre);
       setEditar(true);
+      setDescripciones(articulo.fotos.map(foto => foto.descripcion));
       setArticuloSelected(articulo);
       console.log(JSON.stringify(articulo));
       const mapas = await Promise.all(
@@ -145,7 +151,7 @@ export default function Landing() {
 
   useEffect(() => {
 
-  }, [articuloSelected, mapaSelected, editar]);
+  }, [articuloSelected, mapaSelected, editar, ubicacion, nombre, descripciones]);
 
 
   return (
@@ -351,10 +357,12 @@ export default function Landing() {
                       </CarouselContent>
                       <CarouselPrevious />
                       <CarouselNext />
-                      <Input
-                        id="mapas"
-                        value={articuloSelected.coordenadas}
-                        className="col-span-3"
+                      <TextField
+                        label="Ubicaciones (opcional)"
+                        value={ubicacion}
+                        onChange={(e) => setUbicacion(e.target.value)}
+                        helperText="Separa con ';', ej: Madrid;Málaga"
+                        multiline
                       />
                     </Carousel>
                     ) :
@@ -386,10 +394,19 @@ export default function Landing() {
                                     className="rounded-lg"
                                   />
                                 </CardContent>
-                                <Input
-                                  id={`foto-${index}`}
-                                  value={foto.descripcion}
-                                  className="col-span-3"
+                                <TextField
+                                  label="Descripcion"
+                                  value={descripciones[index]}
+                                  onChange={(e) => {
+                                    const nuevaDescripcion = e.target.value;
+                                    setDescripciones((prev) => {
+                                      const copia = [...prev];
+                                      copia[index] = nuevaDescripcion; // Actualiza la descripción correspondiente
+                                      return copia;
+                                    });
+                                  }}
+                                  helperText="Separa con ';', ej: Madrid;Málaga"
+                                  multiline
                                 />
                               </Card>
                             </div>
@@ -417,10 +434,11 @@ export default function Landing() {
                   <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
                     <CardHeader>
                       <CardTitle className="text-xl font-bold">
-                        <Input
-                          id="nombre"
-                          value={articuloSelected.nombre}
-                          className="col-span-3"
+                        <TextField
+                          label="Nombre"
+                          value={nombre}
+                          onChange={(e) => setNombre(e.target.value)}
+                          required
                         />
                       </CardTitle>
                     </CardHeader>
