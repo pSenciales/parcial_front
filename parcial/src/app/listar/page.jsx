@@ -139,10 +139,10 @@ export default function Landing() {
     }
   };
 
-  const handleGuardar = async () => {};
+  const handleGuardar = async () => { };
 
-  const handleCancelar = async () => {};
-  
+  const handleCancelar = async () => { };
+
   useEffect(() => {
 
   }, [articuloSelected, mapaSelected, editar]);
@@ -319,25 +319,124 @@ export default function Landing() {
             </div>
           ) : (
             <div className="text-center">
-            <form className="space-y-4">
-              <div>
-                <Label htmlFor="nombre">Nombre</Label>
-                <Input id="nombre" type="text" defaultValue={articuloSelected.nombre} />
-              </div>
-              <div>
-                <Label htmlFor="ubicaciones">Ubicaciones</Label>
-                <Input id="ubicaciones" type="text" defaultValue={articuloSelected.coordenadas.map(coord => `${coord.latitud}, ${coord.longitud}`).join('; ')} />
-              </div>
-              <div>
-                <Label htmlFor="descripciones">Descripciones de las imágenes</Label>
-                <Input id="descripciones" type="text" defaultValue={articuloSelected.fotos.map(foto => foto.descripcion).join('; ')} />
-              </div>
-              <div className="flex justify-between">
-                <button type="button" onClick={handleGuardar} className="px-4 py-2 bg-green-500 text-white rounded-lg">Guardar</button>
-                <button type="button" onClick={handleCancelar} className="px-4 py-2 bg-red-500 text-white rounded-lg">Cancelar</button>
-              </div>
-            </form>
-          </div>
+              <Tabs defaultValue="account" className="w-full flex flex-col items-center">
+                <TabsList>
+                  <TabsTrigger value="account">Mapas</TabsTrigger>
+                  <TabsTrigger value="password">Imágenes</TabsTrigger>
+                  <TabsTrigger value="details">Detalles</TabsTrigger>
+                </TabsList>
+
+                <TabsContent
+                  value="account"
+                  className="transition-all duration-300 transform scale-100 opacity-100"
+                >
+                  <div className="flex justify-center items-center w-full">
+                    {articuloSelected && articuloSelected.coordenadas.length > 0 ? (<Carousel className="w-full max-w-xs">
+                      <CarouselContent>
+                        {mapaSelected.map((mapa, index) => (
+                          <CarouselItem key={index}>
+                            <div className="p-1">
+                              <Card>
+                                <CardContent className="flex aspect-square items-center justify-center p-6">
+                                  <iframe
+                                    src={mapa}
+                                    className="w-full h-64 rounded-md border"
+                                    title="Mapa del Artículo"
+                                  />
+                                </CardContent>
+                              </Card>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                      <Input
+                        id="mapas"
+                        value={articuloSelected.coordenadas}
+                        className="col-span-3"
+                      />
+                    </Carousel>
+                    ) :
+                      <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                        <CardHeader>
+                          <CardTitle className="text-xl font-bold">
+                            No se pudieron cargar mapas
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>}
+                  </div>
+                </TabsContent>
+
+                <TabsContent
+                  value="password"
+                  className="transition-all duration-300 transform scale-100 opacity-100"
+                >
+                  <div className="flex justify-center items-center w-full">
+                    {articuloSelected && articuloSelected.fotos.length > 0 ? (<Carousel className="w-full max-w-xs">
+                      <CarouselContent>
+                        {articuloSelected.fotos.map((foto, index) => (
+                          <CarouselItem key={index}>
+                            <div className="p-1">
+                              <Card>
+                                <CardContent className="flex aspect-square items-center justify-center p-6">
+                                  <img
+                                    src={foto.url}
+                                    alt={`Foto ${index}`}
+                                    className="rounded-lg"
+                                  />
+                                </CardContent>
+                                <Input
+                                  id={`foto-${index}`}
+                                  value={foto.descripcion}
+                                  className="col-span-3"
+                                />
+                              </Card>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                    </Carousel>
+                    ) :
+                      <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                        <CardHeader>
+                          <CardTitle className="text-xl font-bold">
+                            Aun no hay fotos disponibles
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>}
+                  </div>
+                </TabsContent>
+
+                <TabsContent
+                  value="details"
+                  className="transition-all duration-300 transform scale-100 opacity-100"
+                >
+                  <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold">
+                        <Input
+                          id="nombre"
+                          value={articuloSelected.nombre}
+                          className="col-span-3"
+                        />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600">
+                        <strong>Autor:</strong> {articuloSelected.autor}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <strong>Fecha:</strong> {parseFecha(articuloSelected.fecha)}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+
+            </div>
           )) : (
             <p className="text-center">Todavía no se ha seleccionado el articulo</p>
           )}
