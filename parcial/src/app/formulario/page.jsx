@@ -138,7 +138,7 @@ export default function VersionCreatePage() {
               coordenadas.push({
                 latitud: response.data.lat,
                 longitud: response.data.lon,
-                lugar, // Guarda el nombre del lugar para referencia
+                lugar: lugar
               });
             } else {
               console.error(`No se encontraron coordenadas para la dirección: ${lugar}`);

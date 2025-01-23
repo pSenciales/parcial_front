@@ -120,7 +120,7 @@ export default function Landing() {
   const handleEditar = async (index) => {
     try {
       const articulo = articulos[index];
-      setUbicacion(articulo.ubicacion);
+      setUbicacion(articulo.coordenadas.map(coordenada => `${coordenada.lugar}`).join(";"));
       setNombre(articulo.nombre);
       setEditar(true);
       setDescripciones(articulo.fotos.map(foto => foto.descripcion));
