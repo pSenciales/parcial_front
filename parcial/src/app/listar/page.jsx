@@ -48,6 +48,7 @@ export default function Landing() {
   const [articulos, setArticulos] = useState([]);
   const [articuloSelected, setArticuloSelected] = useState();
   const [mapaSelected, setMapaSelected] = useState([]);
+  const [editar, setEditar] = useState(false);
 
 
 
@@ -98,13 +99,33 @@ export default function Landing() {
     }
 
   };
-  
+
 
   const handleVisualizar = async (index) => {
     try {
       const articulo = articulos[index];
+      setEditar(false);
       setArticuloSelected(articulo);
 
+      const mapas = await Promise.all(
+        articulo.coordenadas.map(async (coordenada) => {
+          const res = await axios.get(`${MAPA_BASE_API}/${coordenada.latitud}/${coordenada.longitud}`);
+          return res.data.iframeUrl;
+        })
+      );
+
+      setMapaSelected(mapas);
+    } catch (error) {
+      console.error("Error al visualizar:", error);
+    }
+  };
+
+  const handleEditar = async (index) => {
+    try {
+      const articulo = articulos[index];
+      setEditar(true);
+      setArticuloSelected(articulo);
+      console.log(JSON.stringify(articulo));
       const mapas = await Promise.all(
         articulo.coordenadas.map(async (coordenada) => {
           const res = await axios.get(`${MAPA_BASE_API}/${coordenada.latitud}/${coordenada.longitud}`);
@@ -184,7 +205,7 @@ export default function Landing() {
           Articulo seleccionado
         </h1>
         <div className="form w-full max-w-sm space-y-4">
-          {articuloSelected ? (
+          {articuloSelected ? (!editar ? (
             <div className="text-center">
               <Tabs defaultValue="account" className="w-full flex flex-col items-center">
                 <TabsList>
@@ -294,7 +315,28 @@ export default function Landing() {
 
             </div>
           ) : (
-            <><p className="text-center">Todavía no se ha seleccionado el articulo</p></>
+            <div className="text-center">
+            <form className="space-y-4">
+              <div>
+                <Label htmlFor="nombre">Nombre</Label>
+                <Input id="nombre" type="text" defaultValue={articuloSelected.nombre} />
+              </div>
+              <div>
+                <Label htmlFor="ubicaciones">Ubicaciones</Label>
+                <Input id="ubicaciones" type="text" defaultValue={articuloSelected.coordenadas.map(coord => `${coord.latitud}, ${coord.longitud}`).join('; ')} />
+              </div>
+              <div>
+                <Label htmlFor="descripciones">Descripciones de las imágenes</Label>
+                <Input id="descripciones" type="text" defaultValue={articuloSelected.fotos.map(foto => foto.descripcion).join('; ')} />
+              </div>
+              <div className="flex justify-between">
+                <button type="button" onClick={handleGuardar} className="px-4 py-2 bg-green-500 text-white rounded-lg">Guardar</button>
+                <button type="button" onClick={handleCancelar} className="px-4 py-2 bg-red-500 text-white rounded-lg">Cancelar</button>
+              </div>
+            </form>
+          </div>
+          )) : (
+            <p className="text-center">Todavía no se ha seleccionado el articulo</p>
           )}
         </div>
       </div>
