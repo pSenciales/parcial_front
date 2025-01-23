@@ -23,14 +23,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -41,11 +33,12 @@ const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
 const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
 
 
-async function crearVersion(autor, coordenadas) {
+async function crearVersion(autor, nombre, coordenadas) {
   try {
     console.log(ARTICULO_BASE_API + "\t" + IMAGENES_BASE_API + "\n");
     const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, {
       autor: autor,
+      nombre: nombre,
       coordenadas: coordenadas
     });
     if (res.status === 200 || res.status === 201) {
@@ -69,37 +62,14 @@ export default function VersionCreatePage() {
   const [error, setError] = useState("");
   const [isError, setIsError] = useState(false);
   const [ubicacion, setUbicacion] = useState("");
-  const [ubicacionesParse, setUbicacionesParse] = useState([]);
-  const [ubicacionesNumber, setUbicacionesNumber] = useState(0);
-  const [imageNumber, setImageNumber] = useState(0);
-  const [selectedIndex, setSelectedIndex] = useState([]);
-
-
-
   const router = useRouter();
-
-  useEffect(() => {
-    const parsedUbicaciones = ubicacion.split(";").map((u) => u.trim()).filter(Boolean);
-    setUbicacionesParse(parsedUbicaciones);
-    setUbicacionesNumber(parsedUbicaciones.length);
-    setSelectedIndex(Array.from({ length: parsedUbicaciones.length }, (_, i) => i));
-
-    if (parsedUbicaciones.length < images.length) {
-      setImages((prevImages) => prevImages.slice(0, parsedUbicaciones.length));
-      setDescripciones((prevDescripciones) => prevDescripciones.slice(0, parsedUbicaciones.length));
-    } else {
-      setError("");
-      setIsError(false);
-    }
-  }, [ubicacion, images]);
-
 
   const handleFileInputChange = (e) => {
     const files = Array.from(e.target.files);
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
-    if (images.length + imageFiles.length > ubicacionesNumber) {
-      setError("*Solo se pueden subir una imagen por ubicación*");
+    if (images.length + imageFiles.length > 5) {
+      setError("*Solo se pueden subir hasta 5 imágenes*");
       setIsError(true);
     } else {
       const newImages = imageFiles.map((file) => ({
@@ -108,10 +78,8 @@ export default function VersionCreatePage() {
       }));
       setImages((prev) => [...prev, ...newImages]);
       setDescripciones((prev) => [...prev, ...newImages.map(() => "")]);
-
       setError("");
       setIsError(false);
-      setImageNumber(images.length + imageFiles.length);
     }
   };
 
@@ -120,8 +88,8 @@ export default function VersionCreatePage() {
     const files = Array.from(event.dataTransfer.files);
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
-    if (images.length + imageFiles.length > ubicacionesNumber) {
-      setError("*Solo se pueden subir una imagen por ubicación*");
+    if (images.length + imageFiles.length > 5) {
+      setError("*Solo se pueden subir hasta 5 imágenes*");
       setIsError(true);
     } else {
       const newImages = imageFiles.map((file) => ({
@@ -132,7 +100,6 @@ export default function VersionCreatePage() {
       setDescripciones((prev) => [...prev, ...newImages.map(() => "")]); // Añade descripciones vacías
       setError("");
       setIsError(false);
-      setImageNumber(images.length + imageFiles.length);
     }
   };
 
@@ -195,7 +162,7 @@ export default function VersionCreatePage() {
 
     try {
 
-      const nuevaVersion = await crearVersion(autor, coordenadas);
+      const nuevaVersion = await crearVersion(autor, nombre, coordenadas);
 
       if (nuevaVersion) {
         try {
@@ -332,7 +299,7 @@ export default function VersionCreatePage() {
         maxWidth: 500, // Ancho máximo del cuadro
         width: '90%', // Ancho relativo para adaptarse a pantallas pequeñas
       }}>
-        <h1 className="text-2xl font-bold mb-3">Crear Nuevo Mapa</h1>
+        <h1 className="text-2xl font-bold mb-3">Crear Nueva Versión</h1>
         <form
           onSubmit={handleSubmit}
           style={{
@@ -343,13 +310,13 @@ export default function VersionCreatePage() {
             maxWidth: '400px',
           }}
         >
+          <TextField label="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
           <TextField
-            label="Ubicaciones"
+            label="Ubicaciones (opcional)"
             value={ubicacion}
             onChange={(e) => setUbicacion(e.target.value)}
-            helperText="Separa las ubicaciones con ';'"
+            helperText="Separa con ';', ej: Madrid;Málaga"
             multiline
-            required
           />
           <div className="grid grid-cols-1 gap-2">
             <Sheet>
@@ -363,7 +330,7 @@ export default function VersionCreatePage() {
                 <SheetHeader>
                   <SheetTitle>Suelta las imágenes aquí</SheetTitle>
                   <SheetDescription>
-                    Las imágenes se subirán al mapa, ten en cuenta que puedes cambiar a qué ubicación pertenece la imagen
+                    Las imágenes se subirán al artículo
                   </SheetDescription>
                 </SheetHeader>
                 <div
@@ -415,41 +382,33 @@ export default function VersionCreatePage() {
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
                               <DialogHeader>
-                                <DialogTitle>Asigna la ubicación</DialogTitle>
+                                <DialogTitle>Añadir descripción</DialogTitle>
                                 <DialogDescription>
-                                  Cambia la ubicación de la imagen
+                                  Asigna una descripción a la imagen
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="grid gap-4 py-4">
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                  <Label htmlFor={`ubicacion-${index}`} className="text-right">
-                                    Ubicación
+                                  <Label htmlFor={`descripcion-${index}`} className="text-right">
+                                    Descripción
                                   </Label>
-                                  <Select
-                                    value={descripciones[index]}
-                                      onValueChange={(value) => {
-                                      const newDescripciones = [...descripciones];
-                                      newDescripciones[index] = value; 
-                                      setDescripciones(newDescripciones);
+                                  <Input
+                                    id={`descripcion-${index}`}
+                                    value={descripciones[index] || ""}
+                                    onChange={(e) => {
+                                      const nuevaDescripcion = e.target.value;
+                                      setDescripciones((prev) => {
+                                        const copia = [...prev];
+                                        copia[index] = nuevaDescripcion; // Actualiza la descripción correspondiente
+                                        return copia;
+                                      });
                                     }}
-                                  >
-                                    <SelectTrigger className="w-[180px]">
-                                      <SelectValue placeholder="Selecciona una ubicación" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {ubicacionesParse.map((ubicacion, ubicacionIndex) => (
-                                        <SelectItem select key={ubicacionIndex} value={ubicacion}>
-                                          {ubicacion}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                    className="col-span-3"
+                                  />
                                 </div>
                               </div>
                             </DialogContent>
                           </Dialog>
-
-
                           <button
                             onClick={() => handleMoveR(index)}
                             className="absolute bottom-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-200"
