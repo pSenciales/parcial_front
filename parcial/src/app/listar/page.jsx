@@ -203,7 +203,7 @@ export default function Landing() {
 
   useEffect(() => {
 
-  }, [articuloSelected, mapaSelected, editar, ubicacion, nombre, descripciones, index]);
+  }, [articuloSelected, mapaSelected, editar, index]);
 
 
   return (
@@ -506,10 +506,10 @@ export default function Landing() {
                 </TabsContent>
               </Tabs>
               <div className="flex justify-center items-center w-full">
-                <button onClick={handleGuardar(index)} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
+                <button onClick={ () => {handleGuardar(index)}} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
                   Guardar
                 </button>
-                <button onClick={handleVisualizar(index)} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
+                <button onClick={ () => {handleVisualizar(index)}} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
                   Cancelar
                 </button>
               </div>
