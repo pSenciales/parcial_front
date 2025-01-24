@@ -351,7 +351,7 @@ export default function Landing() {
                       </CarouselContent>
                       <CarouselPrevious />
                       <CarouselNext />
-                      <TextField
+                      <TextField className="mt-2"
                         label="Ubicaciones (opcional)"
                         value={ubicacion}
                         onChange={(e) => setUbicacion(e.target.value)}
@@ -447,7 +447,14 @@ export default function Landing() {
                   </Card>
                 </TabsContent>
               </Tabs>
-
+              <div className="flex justify-center items-center w-full">
+                <button onClick={handleGuardar} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
+                  Guardar
+                </button>
+                <button onClick={handleCancelar} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
+                  Cancelar
+                </button>
+              </div>
             </div>
           )) : (
             <p className="text-center">Todavía no se ha seleccionado el articulo</p>
