@@ -71,7 +71,7 @@ export default function Landing() {
 
   useEffect(() => {
     fetcharticulos();
-  }, [articulos]);
+  }, [articulos, editar]);
 
   const handleBorrar = async (id) => {
     try {
@@ -101,8 +101,8 @@ export default function Landing() {
 
   const handleVisualizar = async (index) => {
     try {
-      const articulo = articulos[index];
       setEditar(false);
+      const articulo = articulos[index];
       setIndex(index);
       setArticuloSelected(articulo);
 
@@ -180,6 +180,7 @@ export default function Landing() {
         coordenadas,
         descripciones
       });
+
 
       if (res.status === 200) {
         Swal.fire({
