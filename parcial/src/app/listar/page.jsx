@@ -72,7 +72,7 @@ export default function Landing() {
   useEffect(() => {
     fetcharticulos();
   }, [articulos, editar, mapaSelected, articuloSelected, index]);
-  
+
 
   const handleBorrar = async (id) => {
     try {
@@ -143,38 +143,38 @@ export default function Landing() {
     }
   };
 
-  const handleGuardar = async (index) => { 
+  const handleGuardar = async (index) => {
     try {
       const articulo = articulos[index];
       let coordenadas = [];
 
       if (ubicacion?.trim()) {
-            // Divide las ubicaciones por ';' y elimina espacios extra
-            const ubicaciones = ubicacion.split(";").map((u) => u.trim());
-      
-            try {
-              // Procesar cada ubicación y obtener sus coordenadas
-              for (const lugar of ubicaciones) {
-                if (lugar) {
-                  const response = await axios.get(`${MAPA_BASE_API}/${encodeURIComponent(lugar)}`);
-                  if (response.status === 200 && response.data) {
-                    coordenadas.push({
-                      latitud: response.data.lat,
-                      longitud: response.data.lon,
-                      lugar: lugar
-                    });
-                  } else {
-                    console.error(`No se encontraron coordenadas para la dirección: ${lugar}`);
-                    alert(`No se pudieron obtener coordenadas para la dirección: ${lugar}. Verifica la ubicación ingresada.`);
-                  }
-                }
+        // Divide las ubicaciones por ';' y elimina espacios extra
+        const ubicaciones = ubicacion.split(";").map((u) => u.trim());
+
+        try {
+          // Procesar cada ubicación y obtener sus coordenadas
+          for (const lugar of ubicaciones) {
+            if (lugar) {
+              const response = await axios.get(`${MAPA_BASE_API}/${encodeURIComponent(lugar)}`);
+              if (response.status === 200 && response.data) {
+                coordenadas.push({
+                  latitud: response.data.lat,
+                  longitud: response.data.lon,
+                  lugar: lugar
+                });
+              } else {
+                console.error(`No se encontraron coordenadas para la dirección: ${lugar}`);
+                alert(`No se pudieron obtener coordenadas para la dirección: ${lugar}. Verifica la ubicación ingresada.`);
               }
-            } catch (error) {
-              console.error("Error al obtener las coordenadas:", error);
-              alert("Hubo un problema al procesar las ubicaciones ingresadas.");
-              return;
             }
           }
+        } catch (error) {
+          console.error("Error al obtener las coordenadas:", error);
+          alert("Hubo un problema al procesar las ubicaciones ingresadas.");
+          return;
+        }
+      }
 
       const res = await axios.put(`${ARTICULO_BASE_API}/${articulo._id}`, {
         nombre,
@@ -182,7 +182,7 @@ export default function Landing() {
         descripciones
       });
 
-      
+
       if (res.status === 200) {
         Swal.fire({
           icon: "success",
@@ -386,34 +386,40 @@ export default function Landing() {
                   className="transition-all duration-300 transform scale-100 opacity-100"
                 >
                   <div className="flex justify-center items-center w-full">
-                    {articuloSelected && articuloSelected.coordenadas.length > 0 ? (<Carousel className="w-full max-w-xs">
-                      <CarouselContent>
-                        {mapaSelected.map((mapa, index) => (
-                          <CarouselItem key={index}>
-                            <div className="p-1">
-                              <Card>
-                                <CardContent className="flex aspect-square items-center justify-center p-6">
-                                  <iframe
-                                    src={mapa}
-                                    className="w-full h-64 rounded-md border"
-                                    title="Mapa del Artículo"
-                                  />
-                                </CardContent>
-                              </Card>
-                            </div>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                      <CarouselPrevious />
-                      <CarouselNext />
-                      <TextField className="mt-4"
-                        label="Ubicaciones (opcional)"
-                        value={ubicacion}
-                        onChange={(e) => setUbicacion(e.target.value)}
-                        helperText="Separa con ';', ej: Madrid;Málaga"
-                        multiline
-                      />
-                    </Carousel>
+                    {articuloSelected && articuloSelected.coordenadas.length > 0 ? (
+                      <div className="flex justify-center items-center w-full">
+                        <Carousel className="w-full max-w-xs">
+                          <CarouselContent>
+                            {mapaSelected.map((mapa, index) => (
+                              <CarouselItem key={index}>
+                                <div className="p-1">
+                                  <Card>
+                                    <CardContent className="flex aspect-square items-center justify-center p-6">
+                                      <iframe
+                                        src={mapa}
+                                        className="w-full h-64 rounded-md border"
+                                        title="Mapa del Artículo"
+                                      />
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious />
+                          <CarouselNext />
+                        </Carousel>
+
+                        <TextField className="mt-2"
+                          label="Ubicaciones (opcional)"
+                          value={ubicacion}
+                          onChange={(e) => setUbicacion(e.target.value)}
+                          helperText="Separa con ';', ej: Madrid;Málaga"
+                          multiline
+                        />
+
+                      </div>
+
                     ) :
                       <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
                         <CardHeader>
@@ -503,10 +509,10 @@ export default function Landing() {
                 </TabsContent>
               </Tabs>
               <div className="flex justify-center items-center w-full">
-                <button onClick={ () => {handleGuardar(index)}} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
+                <button onClick={() => { handleGuardar(index) }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
                   Guardar
                 </button>
-                <button onClick={ () => {handleVisualizar(index)}} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
+                <button onClick={() => { handleVisualizar(index) }} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
                   Cancelar
                 </button>
               </div>
@@ -516,6 +522,6 @@ export default function Landing() {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 }
