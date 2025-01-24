@@ -410,7 +410,7 @@ export default function Landing() {
                           <CarouselNext />
                         </Carousel>
 
-                        <TextField className="mt-2"
+                        <TextField className="mt-4"
                           label="Ubicaciones (opcional)"
                           value={ubicacion}
                           onChange={(e) => setUbicacion(e.target.value)}
