@@ -175,7 +175,7 @@ export default function Landing() {
             }
           }
 
-      const res = await axios.put(`${ARTICULO_BASE_API}/articulo/${articulo._id}`, {
+      const res = await axios.put(`${ARTICULO_BASE_API}/${articulo._id}`, {
         nombre,
         coordenadas,
         descripciones
