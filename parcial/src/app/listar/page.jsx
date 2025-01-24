@@ -71,7 +71,7 @@ export default function Landing() {
 
   useEffect( () => {
     fetcharticulos();
-  }, [articulos, editar]);
+  }, [articulos, editar, mapaSelected, articuloSelected, index]);
 
   const handleBorrar = async (id) => {
     try {
