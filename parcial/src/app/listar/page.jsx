@@ -69,8 +69,8 @@ export default function Landing() {
     }
   };
 
-  useEffect(() => {
-    fetcharticulos();
+  useEffect(async () => {
+    await fetcharticulos();
   }, [articulos, editar]);
 
   const handleBorrar = async (id) => {
