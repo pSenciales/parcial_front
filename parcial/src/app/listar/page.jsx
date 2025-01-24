@@ -388,37 +388,40 @@ export default function Landing() {
                   <div className="flex justify-center items-center w-full">
                     {articuloSelected && articuloSelected.coordenadas.length > 0 ? (
                       <div>
-                        <Carousel className="w-full max-w-xs">
-                          <CarouselContent>
-                            {mapaSelected.map((mapa, index) => (
-                              <CarouselItem key={index}>
-                                <div className="p-1">
-                                  <Card>
-                                    <CardContent className="flex aspect-square items-center justify-center p-6">
-                                      <iframe
-                                        src={mapa}
-                                        className="w-full h-64 rounded-md border"
-                                        title="Mapa del Artículo"
-                                      />
-                                    </CardContent>
-                                  </Card>
-                                </div>
-                              </CarouselItem>
-                            ))}
-                          </CarouselContent>
-                          <CarouselPrevious />
-                          <CarouselNext />
-                        </Carousel>
+                      <Carousel className="w-full max-w-xs">
+                        <CarouselContent>
+                          {mapaSelected.map((mapa, index) => (
+                            <CarouselItem key={index}>
+                              <div className="p-1">
+                                <Card>
+                                  <CardContent className="flex aspect-square items-center justify-center p-6">
+                                    <iframe
+                                      src={mapa}
+                                      className="w-full h-64 rounded-md border"
+                                      title="Mapa del Artículo"
+                                    />
+                                  </CardContent>
+                                </Card>
+                              </div>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        <CarouselPrevious />
+                        <CarouselNext />
+                      </Carousel>
 
-                        <TextField className="mt-4"
+                      <div className="mt-4 my-4">
+                        <TextField
+                          style={{ marginTop: "1rem" }}
                           label="Ubicaciones (opcional)"
                           value={ubicacion}
                           onChange={(e) => setUbicacion(e.target.value)}
                           helperText="Separa con ';', ej: Madrid;Málaga"
                           multiline
                         />
-
                       </div>
+                    </div>
+                    
 
                     ) :
                       <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
