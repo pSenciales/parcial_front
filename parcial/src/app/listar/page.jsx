@@ -387,7 +387,7 @@ export default function Landing() {
                 >
                   <div className="flex justify-center items-center w-full">
                     {articuloSelected && articuloSelected.coordenadas.length > 0 ? (
-                      <div className="flex justify-center items-center w-full">
+                      <div>
                         <Carousel className="w-full max-w-xs">
                           <CarouselContent>
                             {mapaSelected.map((mapa, index) => (
