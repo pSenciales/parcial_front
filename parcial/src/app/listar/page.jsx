@@ -188,7 +188,9 @@ export default function Landing() {
           title: "Artículo actualizado",
           text: "El artículo ha sido actualizado correctamente",
         });
-        setEditar(false);
+        await fetcharticulos().then(() => {
+          handleVisualizar(index);
+        });
       } else {
         Swal.fire({
           icon: "error",
