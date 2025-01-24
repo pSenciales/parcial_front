@@ -189,7 +189,6 @@ export default function Landing() {
           title: "Artículo actualizado",
           text: "El artículo ha sido actualizado correctamente",
         });
-        setEditar(false);
       } else {
         Swal.fire({
           icon: "error",
@@ -197,6 +196,7 @@ export default function Landing() {
           text: "Hubo un error al actualizar el artículo",
         });
       }
+      setEditar(false);
     } catch (error) {
       console.error("Error al guardar:", error);
     }
