@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/carousel"
 
 import { TextField } from '@mui/material';
-import { set } from "lodash";
 
 const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
 const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
@@ -182,13 +181,14 @@ export default function Landing() {
         descripciones
       });
 
-
+      
       if (res.status === 200) {
         Swal.fire({
           icon: "success",
           title: "Artículo actualizado",
           text: "El artículo ha sido actualizado correctamente",
         });
+        setEditar(false);
       } else {
         Swal.fire({
           icon: "error",
@@ -196,7 +196,6 @@ export default function Landing() {
           text: "Hubo un error al actualizar el artículo",
         });
       }
-      setEditar(false);
     } catch (error) {
       console.error("Error al guardar:", error);
     }
