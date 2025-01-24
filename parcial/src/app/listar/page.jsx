@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/carousel"
 
 import { TextField } from '@mui/material';
+import { set } from "lodash";
 
 const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
 const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
@@ -188,8 +189,7 @@ export default function Landing() {
           title: "Artículo actualizado",
           text: "El artículo ha sido actualizado correctamente",
         });
-        await fetcharticulos();
-        handleVisualizar(index);
+        setEditar(false);
       } else {
         Swal.fire({
           icon: "error",
