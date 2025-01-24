@@ -69,8 +69,8 @@ export default function Landing() {
     }
   };
 
-  useEffect(async () => {
-    await fetcharticulos();
+  useEffect( () => {
+    fetcharticulos();
   }, [articulos, editar]);
 
   const handleBorrar = async (id) => {
@@ -188,6 +188,7 @@ export default function Landing() {
           title: "Artículo actualizado",
           text: "El artículo ha sido actualizado correctamente",
         });
+        await fetcharticulos();
         handleVisualizar(index);
       } else {
         Swal.fire({
