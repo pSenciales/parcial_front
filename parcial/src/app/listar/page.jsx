@@ -69,9 +69,10 @@ export default function Landing() {
     }
   };
 
-  useEffect( () => {
+  useEffect(() => {
     fetcharticulos();
   }, [articulos, editar, mapaSelected, articuloSelected, index]);
+
 
   const handleBorrar = async (id) => {
     try {
@@ -142,38 +143,38 @@ export default function Landing() {
     }
   };
 
-  const handleGuardar = async (index) => { 
+  const handleGuardar = async (index) => {
     try {
       const articulo = articulos[index];
       let coordenadas = [];
 
       if (ubicacion?.trim()) {
-            // Divide las ubicaciones por ';' y elimina espacios extra
-            const ubicaciones = ubicacion.split(";").map((u) => u.trim());
-      
-            try {
-              // Procesar cada ubicación y obtener sus coordenadas
-              for (const lugar of ubicaciones) {
-                if (lugar) {
-                  const response = await axios.get(`${MAPA_BASE_API}/${encodeURIComponent(lugar)}`);
-                  if (response.status === 200 && response.data) {
-                    coordenadas.push({
-                      latitud: response.data.lat,
-                      longitud: response.data.lon,
-                      lugar: lugar
-                    });
-                  } else {
-                    console.error(`No se encontraron coordenadas para la dirección: ${lugar}`);
-                    alert(`No se pudieron obtener coordenadas para la dirección: ${lugar}. Verifica la ubicación ingresada.`);
-                  }
-                }
+        // Divide las ubicaciones por ';' y elimina espacios extra
+        const ubicaciones = ubicacion.split(";").map((u) => u.trim());
+
+        try {
+          // Procesar cada ubicación y obtener sus coordenadas
+          for (const lugar of ubicaciones) {
+            if (lugar) {
+              const response = await axios.get(`${MAPA_BASE_API}/${encodeURIComponent(lugar)}`);
+              if (response.status === 200 && response.data) {
+                coordenadas.push({
+                  latitud: response.data.lat,
+                  longitud: response.data.lon,
+                  lugar: lugar
+                });
+              } else {
+                console.error(`No se encontraron coordenadas para la dirección: ${lugar}`);
+                alert(`No se pudieron obtener coordenadas para la dirección: ${lugar}. Verifica la ubicación ingresada.`);
               }
-            } catch (error) {
-              console.error("Error al obtener las coordenadas:", error);
-              alert("Hubo un problema al procesar las ubicaciones ingresadas.");
-              return;
             }
           }
+        } catch (error) {
+          console.error("Error al obtener las coordenadas:", error);
+          alert("Hubo un problema al procesar las ubicaciones ingresadas.");
+          return;
+        }
+      }
 
       const res = await axios.put(`${ARTICULO_BASE_API}/${articulo._id}`, {
         nombre,
@@ -181,16 +182,18 @@ export default function Landing() {
         descripciones
       });
 
-      
+
       if (res.status === 200) {
         Swal.fire({
           icon: "success",
           title: "Artículo actualizado",
           text: "El artículo ha sido actualizado correctamente",
         });
-        await fetcharticulos().then(() => {
-          handleVisualizar(index);
-        });
+        const updatedArticulos = [...articulos];
+        updatedArticulos[index] = { ...articulo, nombre, coordenadas, fotos: descripciones.map((descripcion, i) => ({ ...articulo.fotos[i], descripcion })) };
+        setArticulos(updatedArticulos);
+        setEditar(false);
+        handleVisualizar(index); 
       } else {
         Swal.fire({
           icon: "error",
@@ -203,11 +206,6 @@ export default function Landing() {
     }
 
   };
-
-  useEffect(() => {
-
-  }, [articuloSelected, mapaSelected, editar, index]);
-
 
   return (
     <div className="landing flex h-screen p-4 bg-gray-100">
@@ -509,10 +507,10 @@ export default function Landing() {
                 </TabsContent>
               </Tabs>
               <div className="flex justify-center items-center w-full">
-                <button onClick={ () => {handleGuardar(index)}} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
+                <button onClick={() => { handleGuardar(index) }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
                   Guardar
                 </button>
-                <button onClick={ () => {handleVisualizar(index)}} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
+                <button onClick={() => { handleVisualizar(index) }} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
                   Cancelar
                 </button>
               </div>
