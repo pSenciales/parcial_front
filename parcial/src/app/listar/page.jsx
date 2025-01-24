@@ -46,6 +46,7 @@ export default function Landing() {
   const [ubicacion, setUbicacion] = useState("");
   const [nombre, setNombre] = useState("");
   const [descripciones, setDescripciones] = useState([]);
+  const [index, setIndex] = useState(-1);
 
 
 
@@ -102,6 +103,7 @@ export default function Landing() {
     try {
       const articulo = articulos[index];
       setEditar(false);
+      setIndex(index);
       setArticuloSelected(articulo);
 
       const mapas = await Promise.all(
@@ -120,6 +122,7 @@ export default function Landing() {
   const handleEditar = async (index) => {
     try {
       const articulo = articulos[index];
+      setIndex(index);
       setUbicacion(articulo.coordenadas.map(coordenada => `${coordenada.lugar}`).join(";"));
       setNombre(articulo.nombre);
       setEditar(true);
@@ -139,13 +142,68 @@ export default function Landing() {
     }
   };
 
-  const handleGuardar = async () => { };
+  const handleGuardar = async (index) => { 
+    try {
+      const articulo = articulos[index];
+      let coordenadas = [];
 
-  const handleCancelar = async () => { };
+      if (ubicacion?.trim()) {
+            // Divide las ubicaciones por ';' y elimina espacios extra
+            const ubicaciones = ubicacion.split(";").map((u) => u.trim());
+      
+            try {
+              // Procesar cada ubicación y obtener sus coordenadas
+              for (const lugar of ubicaciones) {
+                if (lugar) {
+                  const response = await axios.get(`${MAPA_BASE_API}/${encodeURIComponent(lugar)}`);
+                  if (response.status === 200 && response.data) {
+                    coordenadas.push({
+                      latitud: response.data.lat,
+                      longitud: response.data.lon,
+                      lugar: lugar
+                    });
+                  } else {
+                    console.error(`No se encontraron coordenadas para la dirección: ${lugar}`);
+                    alert(`No se pudieron obtener coordenadas para la dirección: ${lugar}. Verifica la ubicación ingresada.`);
+                  }
+                }
+              }
+            } catch (error) {
+              console.error("Error al obtener las coordenadas:", error);
+              alert("Hubo un problema al procesar las ubicaciones ingresadas.");
+              return;
+            }
+          }
+
+      const res = await axios.put(`${ARTICULO_BASE_API}/articulo/${articulo._id}`, {
+        nombre,
+        coordenadas,
+        descripciones
+      });
+
+      if (res.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Artículo actualizado",
+          text: "El artículo ha sido actualizado correctamente",
+        });
+        handleVisualizar(index);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error al actualizar",
+          text: "Hubo un error al actualizar el artículo",
+        });
+      }
+    } catch (error) {
+      console.error("Error al guardar:", error);
+    }
+
+  };
 
   useEffect(() => {
 
-  }, [articuloSelected, mapaSelected, editar, ubicacion, nombre, descripciones]);
+  }, [articuloSelected, mapaSelected, editar, ubicacion, nombre, descripciones, index]);
 
 
   return (
@@ -351,7 +409,7 @@ export default function Landing() {
                       </CarouselContent>
                       <CarouselPrevious />
                       <CarouselNext />
-                      <TextField className="mt-2"
+                      <TextField className="mt-4"
                         label="Ubicaciones (opcional)"
                         value={ubicacion}
                         onChange={(e) => setUbicacion(e.target.value)}
@@ -448,10 +506,10 @@ export default function Landing() {
                 </TabsContent>
               </Tabs>
               <div className="flex justify-center items-center w-full">
-                <button onClick={handleGuardar} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
+                <button onClick={handleGuardar(index)} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
                   Guardar
                 </button>
-                <button onClick={handleCancelar} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
+                <button onClick={handleVisualizar(index)} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
                   Cancelar
                 </button>
               </div>
