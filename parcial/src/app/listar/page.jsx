@@ -102,25 +102,33 @@ export default function Landing() {
 
   const handleVisualizar = async (index) => {
     try {
-      const expirationDate = new Date();
-      expirationDate.setDate(expirationDate.getDate() + 30);
-      await axios.put(`${ARTICULO_BASE_API}/visita/${articulos[index]._id}`, {
-        usuario: session.user.name,
-        token: session.accessToken
-      });
-      setEditar(false);
-      const articulo = articulos[index];
-      setIndex(index);
-      setArticuloSelected(articulo);
+      if (session) {
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 30);
+        await axios.put(`${ARTICULO_BASE_API}/visita/${articulos[index]._id}`, {
+          usuario: session.user.name,
+          token: session.accessToken
+        });
+        setEditar(false);
+        const articulo = articulos[index];
+        setIndex(index);
+        setArticuloSelected(articulo);
 
-      const mapas = await Promise.all(
-        articulo.coordenadas.map(async (coordenada) => {
-          const res = await axios.get(`${MAPA_BASE_API}/${coordenada.latitud}/${coordenada.longitud}`);
-          return res.data.iframeUrl;
-        })
-      );
+        const mapas = await Promise.all(
+          articulo.coordenadas.map(async (coordenada) => {
+            const res = await axios.get(`${MAPA_BASE_API}/${coordenada.latitud}/${coordenada.longitud}`);
+            return res.data.iframeUrl;
+          })
+        );
 
-      setMapaSelected(mapas);
+        setMapaSelected(mapas);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Debe iniciar sesión para visualizar",
+          footer: '<a href="/">Quiero iniciar sesión</a>'
+        });
+      }
     } catch (error) {
       console.error("Error al visualizar:", error);
     }
@@ -128,22 +136,30 @@ export default function Landing() {
 
   const handleEditar = async (index) => {
     try {
-      const articulo = articulos[index];
-      setIndex(index);
-      setUbicacion(articulo.coordenadas.map(coordenada => `${coordenada.lugar}`).join(";"));
-      setNombre(articulo.nombre);
-      setEditar(true);
-      setDescripciones(articulo.fotos.map(foto => foto.descripcion));
-      setArticuloSelected(articulo);
-      console.log(JSON.stringify(articulo));
-      const mapas = await Promise.all(
-        articulo.coordenadas.map(async (coordenada) => {
-          const res = await axios.get(`${MAPA_BASE_API}/${coordenada.latitud}/${coordenada.longitud}`);
-          return res.data.iframeUrl;
-        })
-      );
+      if (session) {
+        const articulo = articulos[index];
+        setIndex(index);
+        setUbicacion(articulo.coordenadas.map(coordenada => `${coordenada.lugar}`).join(";"));
+        setNombre(articulo.nombre);
+        setEditar(true);
+        setDescripciones(articulo.fotos.map(foto => foto.descripcion));
+        setArticuloSelected(articulo);
+        console.log(JSON.stringify(articulo));
+        const mapas = await Promise.all(
+          articulo.coordenadas.map(async (coordenada) => {
+            const res = await axios.get(`${MAPA_BASE_API}/${coordenada.latitud}/${coordenada.longitud}`);
+            return res.data.iframeUrl;
+          })
+        );
 
-      setMapaSelected(mapas);
+        setMapaSelected(mapas);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Debe iniciar sesión para visualizar",
+          footer: '<a href="/">Quiero iniciar sesión</a>'
+        });
+      }
     } catch (error) {
       console.error("Error al visualizar:", error);
     }
@@ -388,7 +404,7 @@ export default function Landing() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-gray-600">
-                        <strong>Visitas: {articuloSelected.visitas.length}</strong> 
+                        <strong>Visitas: {articuloSelected.visitas.length}</strong>
                       </p>
                       <ScrollArea className="h-72 w-100 rounded-md border">
                         <Table>
