@@ -102,6 +102,13 @@ export default function Landing() {
 
   const handleVisualizar = async (index) => {
     try {
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + 30);
+      await axios.put(`${ARTICULO_BASE_API}/visita/${articulos[index]._id}`, {
+        usuario: session.user.name,
+        token: session.accessToken,
+        caducidad: expirationDate.toISOString()
+      });
       setEditar(false);
       const articulo = articulos[index];
       setIndex(index);
@@ -379,6 +386,7 @@ export default function Landing() {
                   <TabsTrigger value="account">Mapas</TabsTrigger>
                   <TabsTrigger value="password">Imágenes</TabsTrigger>
                   <TabsTrigger value="details">Detalles</TabsTrigger>
+                  <TabsTrigger value="visits">Visitas</TabsTrigger>
                 </TabsList>
 
                 <TabsContent
@@ -388,40 +396,40 @@ export default function Landing() {
                   <div className="flex justify-center items-center w-full">
                     {articuloSelected && articuloSelected.coordenadas.length > 0 ? (
                       <div>
-                      <Carousel className="w-full max-w-xs">
-                        <CarouselContent>
-                          {mapaSelected.map((mapa, index) => (
-                            <CarouselItem key={index}>
-                              <div className="p-1">
-                                <Card>
-                                  <CardContent className="flex aspect-square items-center justify-center p-6">
-                                    <iframe
-                                      src={mapa}
-                                      className="w-full h-64 rounded-md border"
-                                      title="Mapa del Artículo"
-                                    />
-                                  </CardContent>
-                                </Card>
-                              </div>
-                            </CarouselItem>
-                          ))}
-                        </CarouselContent>
-                        <CarouselPrevious />
-                        <CarouselNext />
-                      </Carousel>
+                        <Carousel className="w-full max-w-xs">
+                          <CarouselContent>
+                            {mapaSelected.map((mapa, index) => (
+                              <CarouselItem key={index}>
+                                <div className="p-1">
+                                  <Card>
+                                    <CardContent className="flex aspect-square items-center justify-center p-6">
+                                      <iframe
+                                        src={mapa}
+                                        className="w-full h-64 rounded-md border"
+                                        title="Mapa del Artículo"
+                                      />
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious />
+                          <CarouselNext />
+                        </Carousel>
 
-                      <div className="mt-4 my-4">
-                        <TextField
-                          style={{ marginTop: "1rem" }}
-                          label="Ubicaciones (opcional)"
-                          value={ubicacion}
-                          onChange={(e) => setUbicacion(e.target.value)}
-                          helperText="Separa con ';', ej: Madrid;Málaga"
-                          multiline
-                        />
+                        <div className="mt-4 my-4">
+                          <TextField
+                            style={{ marginTop: "1rem" }}
+                            label="Ubicaciones (opcional)"
+                            value={ubicacion}
+                            onChange={(e) => setUbicacion(e.target.value)}
+                            helperText="Separa con ';', ej: Madrid;Málaga"
+                            multiline
+                          />
+                        </div>
                       </div>
-                    </div>
-                    
+
 
                     ) :
                       <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
@@ -507,6 +515,45 @@ export default function Landing() {
                       <p className="text-sm text-gray-600">
                         <strong>Fecha:</strong> {parseFecha(articuloSelected.fecha)}
                       </p>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent
+                  value="visits"
+                  className="transition-all duration-300 transform scale-100 opacity-100"
+                >
+                  <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold">
+                        Visitas
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600">
+                        <strong>Visitas: {articuloSelected.visitas.length}</strong> 
+                      </p>
+                      <ScrollArea className="h-72 w-100 rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="text-center">Timestamp</TableHead>
+                              <TableHead className="text-center">Usuario</TableHead>
+                              <TableHead className="text-center">Token</TableHead>
+                              <TableHead className="text-center">Caducidad</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {articuloSelected.visitas.map((visita) => (
+                              <TableRow key={visita.id}>
+                                <TableCell className="font-medium text-center">{parseFecha(visita.timestamp)}</TableCell>
+                                <TableCell className="text-center">{visita.usuario}</TableCell>
+                                <TableCell className="text-center">{visita.token}</TableCell>
+                                <TableCell className="text-center">{parseFecha(visita.caducidad)}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </ScrollArea>
                     </CardContent>
                   </Card>
                 </TabsContent>
