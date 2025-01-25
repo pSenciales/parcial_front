@@ -557,7 +557,7 @@ export default function Landing() {
                   </Card>
                 </TabsContent>
               </Tabs>
-              <div className="flex justify-center items-center w-full">
+              <div className="flex justify-center items-center w-full mt-4">
                 <button onClick={() => { handleGuardar(index) }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600">
                   Guardar
                 </button>
