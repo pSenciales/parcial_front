@@ -277,6 +277,7 @@ export default function Landing() {
                   <TabsTrigger value="account">Mapas</TabsTrigger>
                   <TabsTrigger value="password">Imágenes</TabsTrigger>
                   <TabsTrigger value="details">Detalles</TabsTrigger>
+                  <TabsTrigger value="visits">Visitas</TabsTrigger>
                 </TabsList>
 
                 <TabsContent
