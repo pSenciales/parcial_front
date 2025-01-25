@@ -195,7 +195,6 @@ export default function Landing() {
           title: "Artículo actualizado",
           text: "Para visualizar los cambio debe darle a visualizar.",
         });
-        setEditar(false);
       } else {
         Swal.fire({
           icon: "error",
