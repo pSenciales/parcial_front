@@ -18,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area"
 import { FaEye, FaTrashAlt, FaEdit } from "react-icons/fa";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -106,8 +106,7 @@ export default function Landing() {
       expirationDate.setDate(expirationDate.getDate() + 30);
       await axios.put(`${ARTICULO_BASE_API}/visita/${articulos[index]._id}`, {
         usuario: session.user.name,
-        token: session.accessToken,
-        caducidad: expirationDate.toISOString()
+        token: session.accessToken
       });
       setEditar(false);
       const articulo = articulos[index];
@@ -261,6 +260,7 @@ export default function Landing() {
               )}
             </TableBody>
           </Table>
+          <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
 
@@ -376,6 +376,44 @@ export default function Landing() {
                     </CardContent>
                   </Card>
                 </TabsContent>
+                <TabsContent
+                  value="visits"
+                  className="transition-all duration-300 transform scale-100 opacity-100"
+                >
+                  <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold">
+                        Visitas
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600">
+                        <strong>Visitas: {articuloSelected.visitas.length}</strong> 
+                      </p>
+                      <ScrollArea className="h-72 w-100 rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="text-center">Timestamp</TableHead>
+                              <TableHead className="text-center">Usuario</TableHead>
+                              <TableHead className="text-center">Token</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {articuloSelected.visitas.map((visita) => (
+                              <TableRow key={visita.id}>
+                                <TableCell className="font-medium text-center">{parseFecha(visita.timestamp)}</TableCell>
+                                <TableCell className="text-center">{visita.usuario}</TableCell>
+                                <TableCell className="text-center">{visita.token}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                        <ScrollBar orientation="horizontal" />
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
               </Tabs>
 
             </div>
@@ -386,7 +424,6 @@ export default function Landing() {
                   <TabsTrigger value="account">Mapas</TabsTrigger>
                   <TabsTrigger value="password">Imágenes</TabsTrigger>
                   <TabsTrigger value="details">Detalles</TabsTrigger>
-                  <TabsTrigger value="visits">Visitas</TabsTrigger>
                 </TabsList>
 
                 <TabsContent
@@ -515,45 +552,6 @@ export default function Landing() {
                       <p className="text-sm text-gray-600">
                         <strong>Fecha:</strong> {parseFecha(articuloSelected.fecha)}
                       </p>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent
-                  value="visits"
-                  className="transition-all duration-300 transform scale-100 opacity-100"
-                >
-                  <Card className="w-full max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-bold">
-                        Visitas
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600">
-                        <strong>Visitas: {articuloSelected.visitas.length}</strong> 
-                      </p>
-                      <ScrollArea className="h-72 w-100 rounded-md border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="text-center">Timestamp</TableHead>
-                              <TableHead className="text-center">Usuario</TableHead>
-                              <TableHead className="text-center">Token</TableHead>
-                              <TableHead className="text-center">Caducidad</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {articuloSelected.visitas.map((visita) => (
-                              <TableRow key={visita.id}>
-                                <TableCell className="font-medium text-center">{parseFecha(visita.timestamp)}</TableCell>
-                                <TableCell className="text-center">{visita.usuario}</TableCell>
-                                <TableCell className="text-center">{visita.token}</TableCell>
-                                <TableCell className="text-center">{parseFecha(visita.caducidad)}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </ScrollArea>
                     </CardContent>
                   </Card>
                 </TabsContent>
