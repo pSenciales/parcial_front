@@ -24,27 +24,46 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 
-const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
+
+const SALAS_BASE_API = process.env.NEXT_PUBLIC_SALAS_BASE_API;
+const PELICULAS_BASE_API = process.env.NEXT_PUBLIC_PELICULAS_BASE_API;
 const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
 const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
 
 
-async function crearVersion(autor, nombre, coordenadas) {
+async function crearPelicula(nombre) {
   try {
-    console.log(ARTICULO_BASE_API + "\t" + IMAGENES_BASE_API + "\n");
-    const res = await axios.post(`${ARTICULO_BASE_API}/nuevo`, {
+    console.log(PELICULAS_BASE_API + "\t" + IMAGENES_BASE_API + "\n");
+    const res = await axios.post(`${PELICULAS_BASE_API}/nuevo`, {
+      titulo: nombre
+    });
+    if (res.status === 200 || res.status === 201) {
+      return res.data;
+    } else {
+      throw new Error(`Error al crear la pelicula: ${res.statusText}`);
+    }
+  } catch (error) {
+    console.error("Error en crearVersion:", error.message);
+    return null;
+  }
+}
+
+async function crearSala(autor, coordenadas) {
+  try {
+    console.log(PELICULAS_BASE_API + "\t" + IMAGENES_BASE_API + "\n");
+    const res = await axios.post(`${SALAS_BASE_API}/nuevo`, {
       autor: autor,
-      nombre: nombre,
       coordenadas: coordenadas
     });
     if (res.status === 200 || res.status === 201) {
       return res.data;
     } else {
-      throw new Error(`Error al crear la versión: ${res.statusText}`);
+      throw new Error(`Error al crear la sala: ${res.statusText}`);
     }
   } catch (error) {
     console.error("Error en crearVersion:", error.message);
@@ -119,7 +138,49 @@ export default function VersionCreatePage() {
   };
 
 
-  const handleSubmit = async (event) => {
+  const handleSubmitPelicula = async (event) => {
+    event.preventDefault();
+    try {
+
+      const nuevaVersion = await crearPelicula(nombre);
+
+      if (nuevaVersion) {
+        try {
+          // Subir imágenes
+          const uploadPromises = images.map((img, index) => {
+            const imageFormData = new FormData();
+            imageFormData.append("id", nuevaVersion._id);
+            imageFormData.append("descripcion", descripciones[index] || ""); // Añade la descripción
+            imageFormData.append("image", img.file);
+
+            return axios.post(IMAGENES_BASE_API, imageFormData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            });
+          });
+
+          // Esperar a que todas las imágenes se suban
+          await Promise.all(uploadPromises);
+          console.log("Todas las imágenes se han subido con éxito");
+
+          // Revocar las URLs de previsualización
+          images.forEach((img) => URL.revokeObjectURL(img.preview));
+          router.push("/listar");
+
+          // Redirigir al usuario
+        } catch (error) {
+          console.error("Error al subir las imágenes:", error);
+          alert("Hubo un error al subir las imágenes.");
+        }
+      }
+    } catch (error) {
+      console.error("Error al crear la versión:", error);
+      alert("Hubo un problema al crear la versión.");
+    }
+  }
+
+  const handleSubmitSala = async (event) => {
     event.preventDefault();
     const autor = session.user.name;
 
@@ -162,37 +223,10 @@ export default function VersionCreatePage() {
 
     try {
 
-      const nuevaVersion = await crearVersion(autor, nombre, coordenadas);
+      const nuevaVersion = await crearSala(autor, coordenadas);
 
       if (nuevaVersion) {
-        try {
-          // Subir imágenes
-          const uploadPromises = images.map((img, index) => {
-            const imageFormData = new FormData();
-            imageFormData.append("id", nuevaVersion._id);
-            imageFormData.append("descripcion", descripciones[index] || ""); // Añade la descripción
-            imageFormData.append("image", img.file);
-
-            return axios.post(IMAGENES_BASE_API, imageFormData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            });
-          });
-
-          // Esperar a que todas las imágenes se suban
-          await Promise.all(uploadPromises);
-          console.log("Todas las imágenes se han subido con éxito");
-
-          // Revocar las URLs de previsualización
-          images.forEach((img) => URL.revokeObjectURL(img.preview));
           router.push("/listar");
-
-          // Redirigir al usuario
-        } catch (error) {
-          console.error("Error al subir las imágenes:", error);
-          alert("Hubo un error al subir las imágenes.");
-        }
       }
     } catch (error) {
       console.error("Error al crear la versión:", error);
@@ -242,7 +276,7 @@ export default function VersionCreatePage() {
         height: '100vh', // Altura completa de la ventana
         p: 4, // Padding general
       }}>
-      {!session && (
+      {session && (
         <Box
           sx={{
             position: 'absolute',
@@ -287,6 +321,7 @@ export default function VersionCreatePage() {
           </Box>
         </Box>
       )}
+       
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -299,9 +334,15 @@ export default function VersionCreatePage() {
         maxWidth: 500, // Ancho máximo del cuadro
         width: '90%', // Ancho relativo para adaptarse a pantallas pequeñas
       }}>
-        <h1 className="text-2xl font-bold mb-3">Crear Nueva Versión</h1>
+        <Tabs defaultValue="account" className="w-[400px]">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="account">Pelicula</TabsTrigger>
+        <TabsTrigger value="password">Sala</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+      <h1 className="text-2xl font-bold mb-3">Crear Nueva Película</h1>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmitPelicula}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -310,18 +351,11 @@ export default function VersionCreatePage() {
             maxWidth: '400px',
           }}
         >
-          <TextField label="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-          <TextField
-            label="Ubicaciones (opcional)"
-            value={ubicacion}
-            onChange={(e) => setUbicacion(e.target.value)}
-            helperText="Separa con ';', ej: Madrid;Málaga"
-            multiline
-          />
+          <TextField label="Título" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
           <div className="grid grid-cols-1 gap-2">
             <Sheet>
               <SheetTrigger asChild>
-                <Button className={"px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600"}>Añadir imágenes</Button>
+                <Button className={"px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600"}>Añadir imágenes a la cartelera</Button>
               </SheetTrigger>
               <SheetContent
                 side={"bottom"}
@@ -447,6 +481,46 @@ export default function VersionCreatePage() {
           </div>
 
         </form>
+      </TabsContent>
+
+      <TabsContent value="password">
+      <h1 className="text-2xl font-bold mb-3">Crear Nueva Sala</h1>
+        <form
+          onSubmit={handleSubmitSala}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            width: '100%',
+            maxWidth: '400px',
+          }}
+        >
+          <TextField label="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required/>
+          <TextField
+            label="Ubicacion "
+            value={ubicacion}
+            onChange={(e) => setUbicacion(e.target.value)}
+            multiline
+            required
+          />
+          <div className="flex justify-center space-x-4 mt-4">
+            <Button
+              type="submit"
+              className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-green-500 text-white hover:bg-green-600 text-center">
+              Crear
+            </Button>
+            <Button
+              type="button"
+              onClick={handleBack}
+              className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600 text-center">
+              Cancelar
+            </Button>
+          </div>
+
+        </form>
+      </TabsContent>
+    </Tabs>
+       
       </Box>
     </Box>
 

@@ -31,7 +31,8 @@ import {
 
 import { TextField } from '@mui/material';
 
-const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
+const PELICULAS_BASE_API = process.env.NEXT_PUBLIC_PELICULAS_BASE_API;
+const SALAS_BASE_API = process.env.NEXT_PUBLIC_SALAS_BASE_API;
 const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
 const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
 const LOGS_BASE_API = process.env.NEXT_PUBLIC_LOGS_BASE_API;
@@ -58,7 +59,7 @@ export default function Landing() {
 
   const fetcharticulos = async () => {
     try {
-      const res = await axios.get(`${ARTICULO_BASE_API}`);
+      const res = await axios.get(`${PELICULAS_BASE_API}`);
       if (res.status === 200) {
         setArticulos(res.data);
       } else {
@@ -77,7 +78,7 @@ export default function Landing() {
   const handleBorrar = async (id) => {
     try {
       if (session) {
-        const res = await axios.delete(`${ARTICULO_BASE_API}/articulo/${id}`);
+        const res = await axios.delete(`${PELICULAS_BASE_API}/articulo/${id}`);
         if (res.status === 200) {
           await fetcharticulos();
           setArticuloSelected(null);
@@ -102,13 +103,13 @@ export default function Landing() {
 
   const handleVisualizar = async (index) => {
     try {
-      if (session) {
+      if (!session) {
         const expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 30);
-        await axios.put(`${ARTICULO_BASE_API}/visita/${articulos[index]._id}`, {
+        /*await axios.put(`${PELICULAS_BASE_API}/visita/${articulos[index]._id}`, {
           usuario: session.user.name,
           token: session.accessToken
-        });
+        });*/
         setEditar(false);
         const articulo = articulos[index];
         setIndex(index);
@@ -198,7 +199,7 @@ export default function Landing() {
         }
       }
 
-      const res = await axios.put(`${ARTICULO_BASE_API}/${articulo._id}`, {
+      const res = await axios.put(`${PELICULAS_BASE_API}/${articulo._id}`, {
         nombre,
         coordenadas,
         descripciones
