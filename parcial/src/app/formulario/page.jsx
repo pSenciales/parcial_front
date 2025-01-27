@@ -53,11 +53,12 @@ async function crearPelicula(nombre) {
   }
 }
 
-async function crearSala(autor, coordenadas) {
+async function crearSala(autor, coordenadas, nombre) {
   try {
     console.log(PELICULAS_BASE_API + "\t" + IMAGENES_BASE_API + "\n");
     const res = await axios.post(`${SALAS_BASE_API}/nuevo`, {
       autor: autor,
+      nombre:nombre,
       coordenadas: coordenadas
     });
     if (res.status === 200 || res.status === 201) {
@@ -76,6 +77,7 @@ export default function VersionCreatePage() {
   //console.log("Session data:", session);
 
   const [nombre, setNombre] = useState("");
+  const [nombreSala, setNombreSala] = useState("");
   const [descripciones, setDescripciones] = useState([]);
   const [images, setImages] = useState([]);
   const [error, setError] = useState("");
@@ -223,7 +225,7 @@ export default function VersionCreatePage() {
 
     try {
 
-      const nuevaVersion = await crearSala(autor, coordenadas);
+      const nuevaVersion = await crearSala(autor, coordenadas, nombreSala);
 
       if (nuevaVersion) {
           router.push("/listar");
@@ -495,7 +497,7 @@ export default function VersionCreatePage() {
             maxWidth: '400px',
           }}
         >
-          <TextField label="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required/>
+          <TextField label="Nombre" value={nombreSala} onChange={(e) => setNombreSala(e.target.value)} required/>
           <TextField
             label="Ubicacion "
             value={ubicacion}

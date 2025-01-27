@@ -31,8 +31,7 @@ import {
 
 import { TextField } from '@mui/material';
 
-const PELICULAS_BASE_API = process.env.NEXT_PUBLIC_PELICULAS_BASE_API;
-const SALAS_BASE_API = process.env.NEXT_PUBLIC_SALAS_BASE_API;
+const ARTICULO_BASE_API = process.env.NEXT_PUBLIC_ARTICULO_BASE_API;
 const IMAGENES_BASE_API = process.env.NEXT_PUBLIC_IMAGE_BASE_API;
 const MAPA_BASE_API = process.env.NEXT_PUBLIC_MAPA_BASE_API;
 const LOGS_BASE_API = process.env.NEXT_PUBLIC_LOGS_BASE_API;
@@ -59,7 +58,7 @@ export default function Landing() {
 
   const fetcharticulos = async () => {
     try {
-      const res = await axios.get(`${PELICULAS_BASE_API}`);
+      const res = await axios.get(`${ARTICULO_BASE_API}`);
       if (res.status === 200) {
         setArticulos(res.data);
       } else {
@@ -78,7 +77,7 @@ export default function Landing() {
   const handleBorrar = async (id) => {
     try {
       if (session) {
-        const res = await axios.delete(`${PELICULAS_BASE_API}/articulo/${id}`);
+        const res = await axios.delete(`${ARTICULO_BASE_API}/articulo/${id}`);
         if (res.status === 200) {
           await fetcharticulos();
           setArticuloSelected(null);
@@ -106,7 +105,7 @@ export default function Landing() {
       if (!session) {
         const expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 30);
-        /*await axios.put(`${PELICULAS_BASE_API}/visita/${articulos[index]._id}`, {
+        /*await axios.put(`${ARTICULO_BASE_API}/visita/${articulos[index]._id}`, {
           usuario: session.user.name,
           token: session.accessToken
         });*/
@@ -199,7 +198,7 @@ export default function Landing() {
         }
       }
 
-      const res = await axios.put(`${PELICULAS_BASE_API}/${articulo._id}`, {
+      const res = await axios.put(`${ARTICULO_BASE_API}/${articulo._id}`, {
         nombre,
         coordenadas,
         descripciones
@@ -229,7 +228,14 @@ export default function Landing() {
     <div className="landing flex h-screen p-4 bg-gray-100">
       {/* Sección izquierda */}
       <div className="left-section flex-1 bg-gradient-to-r from-green-200 to-blue-200 rounded-3xl flex flex-col justify-center items-center text-center p-8 shadow-lg">
-        <h1 className="text-5xl font-bold text-blue-800 mb-4 font-poppins">
+      <div className="bg-w">
+      <Tabs defaultValue="account" className="w-[400px]">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="account">Pelicula</TabsTrigger>
+        <TabsTrigger value="password">Sala</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+      <h1 className="text-5xl font-bold text-blue-800 mb-4 font-poppins">
           Articulos</h1>
         <ScrollArea className="bg-white h-72 w-9/12 rounded-md border">
           <Table>
@@ -278,6 +284,61 @@ export default function Landing() {
           </Table>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
+      </TabsContent>
+      <TabsContent value="password">
+      <h1 className="text-5xl font-bold text-blue-800 mb-4 font-poppins">
+          Salas</h1>
+        <ScrollArea className="bg-white h-72 w-9/12 rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">Autor</TableHead>
+                <TableHead className="text-center">Nombre</TableHead>
+                <TableHead className="text-center">Fecha</TableHead>
+                <TableHead className="text-center">Visualizar</TableHead>
+                <TableHead className="text-center">Editar</TableHead>
+                <TableHead className="text-center">Borrar</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {articulos && articulos.length > 0 ? (
+                articulos.map((articulo, index) => (
+                  <TableRow key={articulo._id}>
+                    <TableCell className="text-center">{articulo.autor}</TableCell>
+                    <TableCell className="text-center">{articulo.nombre}</TableCell>
+                    <TableCell className="text-center">{parseFecha(articulo.fecha)}</TableCell>
+                    <TableCell className="text-center">
+                      <button onClick={() => { handleVisualizar(index) }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-blue-500 text-white hover:bg-blue-600">
+                        <FaEye />
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button onClick={() => { handleEditar(index) }} className="flex-1 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-yellow-500 text-white hover:bg-yellow-600">
+                        <FaEdit />
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button onClick={() => { handleBorrar(articulo._id) }} className="flex-1 px-4 py-2 ml-2 rounded-lg font-semibold shadow-md transition-all duration-300 bg-red-500 text-white hover:bg-red-600">
+                        <FaTrashAlt />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    No hay artículos disponibles
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </TabsContent>
+      </Tabs>
+      </div>
+       
       </div>
 
       {/* Sección derecha */}
