@@ -276,7 +276,7 @@ export default function VersionCreatePage() {
         height: '100vh', // Altura completa de la ventana
         p: 4, // Padding general
       }}>
-      {session && (
+      {!session && (
         <Box
           sx={{
             position: 'absolute',
